@@ -94,14 +94,23 @@ int main()
 	ImGui::CreateContext();
     // draw in wireframe
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	//ImGui::CreateContext();
-	//ImGui_ImplGlfw_InitForOpenGL(window, true);
-	//ImGui_ImplOpenGL3_Init("#version 130");
-	//ImGui::StyleColorsDark();
+	ImGui_ImplGlfw_InitForOpenGL(window, true);
+	ImGui_ImplOpenGL3_Init("#version 130");
+	ImGui::StyleColorsDark();
+	bool show_demo_window = true;
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window))
     {
+		// Start the Dear ImGui frame
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+		ImGui::NewFrame();
+
+		ImVec2 VecScreen(SCR_WIDTH, SCR_HEIGHT);
+		ImVec2 VecPos(0, 0);
+		ImGui::SetNextWindowSize(VecScreen);
+		ImGui::SetNextWindowPos(VecPos);
         // per-frame time logic
         // --------------------
         float currentFrame = glfwGetTime();
@@ -133,9 +142,30 @@ int main()
         ourShader.setMat4("model", model);
         ourModel.Draw(ourShader);
 
+		ImGui::ShowDemoWindow();
+		ImGui::Begin("Main Window");
+		ImGui::End();
 
+		//// 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
+		//{
+		//	static float f = 0.0f;
+		//	static int counter = 0;
+		//	ImGui::Begin("Settings");                          // Create a window called "Hello, world!" and append into it.
+
+		//	ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
+
+		//	ImGui::SameLine();
+		//	ImGui::Text("counter = %d", counter);
+
+		//	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+		//	ImGui::End();
+		//}
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
+
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
