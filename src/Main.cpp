@@ -1,8 +1,9 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-
-#include <imgui/imgui_impl_glfw.h>
-#include <imgui/imgui_impl_opengl3.h>
+ 
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_glfw.h"
+#include "imgui/imgui_impl_opengl3.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -14,6 +15,9 @@
 #include <learnopengl/model.h>
 
 #include <iostream>
+
+
+
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -85,12 +89,15 @@ int main()
     Model ourModel(FileSystem::getPath("resources/objects/nanosuit/nanosuit.obj"));
 
     
+	// Setup Dear ImGui context
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
     // draw in wireframe
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	ImGui::CreateContext();
-	ImGui_ImplGlfw_InitForOpenGL(GetWindow(), true);
-	ImGui_ImplOpenGL3_Init("#version 130");
-	ImGui::StyleColorsDark();
+	//ImGui::CreateContext();
+	//ImGui_ImplGlfw_InitForOpenGL(window, true);
+	//ImGui_ImplOpenGL3_Init("#version 130");
+	//ImGui::StyleColorsDark();
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window))
