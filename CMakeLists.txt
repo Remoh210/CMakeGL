@@ -58,11 +58,19 @@ configure_file(configuration/root_directory.h.in configuration/root_directory.h)
 include_directories(${CMAKE_BINARY_DIR}/configuration)
 
 # first create relevant static libraries requried for other projects
-add_library(STB_IMAGE "src/stb_image.cpp")
+add_library(STB_IMAGE "src/ThirdParty/stb_image.cpp")
 set(LIBS ${LIBS} STB_IMAGE)
 
-add_library(GLAD "src/glad.c")
+
+set (imgui_headers ${CMAKE_SOURCE_DIR}/includes/imgui/imconfig.h ${CMAKE_SOURCE_DIR}/includes/imgui/imgui.h ${CMAKE_SOURCE_DIR}/includes/imgui/imgui_impl_glfw.h 
+${CMAKE_SOURCE_DIR}/includes/imgui/imgui_impl_opengl3.h ${CMAKE_SOURCE_DIR}/includes/imgui/imgui_internal.h ${CMAKE_SOURCE_DIR}/includes/imgui/imstb_rectpack.h ${CMAKE_SOURCE_DIR}/includes/imgui/imstb_textedit.h ${CMAKE_SOURCE_DIR}/includes/imgui/imstb_truetype.h)
+set (imgui_sources ${CMAKE_SOURCE_DIR}/includes/imgui/imgui.cpp ${CMAKE_SOURCE_DIR}/includes/imgui/imgui_demo.cpp ${CMAKE_SOURCE_DIR}/includes/imgui/imgui_draw.cpp ${CMAKE_SOURCE_DIR}/includes/imgui/imgui_impl_glfw.cpp ${CMAKE_SOURCE_DIR}/includes/imgui/imgui_impl_opengl3.cpp ${CMAKE_SOURCE_DIR}/includes/imgui/imgui_widgets.cpp)
+add_library(ImGui STATIC ${imgui_sources} ${imgui_headers})
+
+add_library(GLAD "src/thirdParty/glad.c")
 set(LIBS ${LIBS} GLAD)
+
+#add_library(IMGUI "src/thirdParty/glad.c" scr2.cpp ... scrx.cpp)
 
 macro(makeLink src dest target)
   add_custom_command(TARGET ${target} POST_BUILD COMMAND ${CMAKE_COMMAND} -E create_symlink ${src} ${dest}  DEPENDS  ${dest} COMMENT "mklink ${src} -> ${dest}")
@@ -109,9 +117,6 @@ foreach(SHADER ${SHADERS})
 if(WIN32)
     # configure_file(${SHADER} "test")
     add_custom_command(TARGET ${PROJECT_NAME} PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${SHADER} $<TARGET_FILE_DIR:${PROJECT_NAME}>)
-    foreach(DLL ${DLLS})
-    add_custom_command(TARGET ${PROJECT_NAME} PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${DLL} $<TARGET_FILE_DIR:${PROJECT_NAME}>)
-    endforeach(DLL)
 elseif(UNIX AND NOT APPLE)
     file(COPY ${SHADER} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/bin/${PROJECT_NAME})
 elseif(APPLE)
@@ -120,6 +125,34 @@ elseif(APPLE)
     makeLink(${SHADER} ${CMAKE_CURRENT_BINARY_DIR}/bin/${CHAPTER}/${SHADERNAME} ${PROJECT_NAME})
 endif(WIN32)
 endforeach(SHADER)
+
+# Copy DLLs
+if(WIN32)
+foreach(DLL ${DLLS})
+add_custom_command(TARGET ${PROJECT_NAME} PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${DLL} $<TARGET_FILE_DIR:${PROJECT_NAME}>)
+endforeach(DLL)
+endif(WIN32)
+
+# Create virtual folders to make it look nicer in VS
+if(MSVC_IDE)
+	# Macro to preserve source files hierarchy in the IDE
+	macro(GroupSources curdir)
+		file(GLOB children RELATIVE ${PROJECT_SOURCE_DIR}/${curdir} ${PROJECT_SOURCE_DIR}/${curdir}/*)
+
+		foreach(child ${children})
+			if(IS_DIRECTORY ${PROJECT_SOURCE_DIR}/${curdir}/${child})
+				GroupSources(${curdir}/${child})
+			else()
+				string(REPLACE "/" "\\" groupname ${curdir})
+				string(REPLACE "src" "Sources" groupname ${groupname})
+				source_group(${groupname} FILES ${PROJECT_SOURCE_DIR}/${curdir}/${child})
+			endif()
+		endforeach()
+	endmacro()
+
+	# Run macro
+	GroupSources(src)
+endif()
 
 if(MSVC)
 configure_file(${CMAKE_SOURCE_DIR}/configuration/visualstudio.vcxproj.user.in ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.vcxproj.user @ONLY)
