@@ -95,13 +95,13 @@ set_target_properties(${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG 
 set_target_properties(${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_CURRENT_BINARY_DIR}/bin/${PROJECT_NAME}")
 endif(WIN32)
 
-file(GLOB SHADERS
+file(GLOB_RECURSE SHADERS
 ${CMAKE_SOURCE_DIR}/src/*.fs
 ${CMAKE_SOURCE_DIR}/src/*.vs
 ${CMAKE_SOURCE_DIR}/src/*.gs
 )
 
-file(GLOB DLLS
+file(GLOB_RECURSE DLLS
 ${CMAKE_SOURCE_DIR}/dlls/*.dll
 )
 
@@ -122,7 +122,7 @@ endif(WIN32)
 endforeach(SHADER)
 
 if(MSVC)
-configure_file(${CMAKE_SOURCE_DIR}/configuration/visualstudio.vcxproj.user.in ${CMAKE_CURRENT_BINARY_DIR}/${NAME}.vcxproj.user @ONLY)
+configure_file(${CMAKE_SOURCE_DIR}/configuration/visualstudio.vcxproj.user.in ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.vcxproj.user @ONLY)
 endif(MSVC)
 
 
