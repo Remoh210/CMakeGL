@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 2.8)
 cmake_policy(VERSION 2.8)
 
-project (LearnOpenGL)
+project (CMakeGL)
 
 IF(NOT CMAKE_BUILD_TYPE)
   SET(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build (Debug or Release)" FORCE)
@@ -54,13 +54,6 @@ else()
   set(LIBS )
 endif(WIN32)
 
-
-set(CHAPTERS
-    1.model_loading
-	)
-set(1.model_loading
-	model_loading)
-
 configure_file(configuration/root_directory.h.in configuration/root_directory.h)
 include_directories(${CMAKE_BINARY_DIR}/configuration)
 
@@ -75,52 +68,63 @@ macro(makeLink src dest target)
   add_custom_command(TARGET ${target} POST_BUILD COMMAND ${CMAKE_COMMAND} -E create_symlink ${src} ${dest}  DEPENDS  ${dest} COMMENT "mklink ${src} -> ${dest}")
 endmacro()
 
-# then create a project file per tutorial
-foreach(CHAPTER ${CHAPTERS})
-    foreach(DEMO ${${CHAPTER}})
-        file(GLOB SOURCE
-            "src/${CHAPTER}/${DEMO}/*.h"
-            "src/${CHAPTER}/${DEMO}/*.cpp"
-            "src/${CHAPTER}/${DEMO}/*.vs"
-            "src/${CHAPTER}/${DEMO}/*.fs"
-            "src/${CHAPTER}/${DEMO}/*.gs"
-        )
-        set(NAME "${CHAPTER}__${DEMO}")
-        add_executable(${NAME} ${SOURCE})
-        target_link_libraries(${NAME} ${LIBS})
-        if(WIN32)
-            set_target_properties(${NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/${CHAPTER}")
-        elseif(UNIX AND NOT APPLE)
-            set_target_properties(${NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/bin/${CHAPTER}")
-        elseif(APPLE)
-            set_target_properties(${NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/bin/${CHAPTER}")
-            set_target_properties(${NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_CURRENT_BINARY_DIR}/bin/${CHAPTER}")
-            set_target_properties(${NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_CURRENT_BINARY_DIR}/bin/${CHAPTER}")
-        endif(WIN32)
-        # copy shader files to build directory
-        file(GLOB SHADERS
-                 "src/${CHAPTER}/${DEMO}/*.vs"
-                 # "src/${CHAPTER}/${DEMO}/*.frag"model_loading.cpp
-                 "src/${CHAPTER}/${DEMO}/*.fs"
-                 "src/${CHAPTER}/${DEMO}/*.gs"
-        )
-        foreach(SHADER ${SHADERS})
-            if(WIN32)
-                # configure_file(${SHADER} "test")
-                add_custom_command(TARGET ${NAME} PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${SHADER} $<TARGET_FILE_DIR:${NAME}>)
-            elseif(UNIX AND NOT APPLE)
-                file(COPY ${SHADER} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/bin/${CHAPTER})
-            elseif(APPLE)
-                # create symbolic link for *.vs *.fs *.gs
-                get_filename_component(SHADERNAME ${SHADER} NAME)
-                makeLink(${SHADER} ${CMAKE_CURRENT_BINARY_DIR}/bin/${CHAPTER}/${SHADERNAME} ${NAME})
-            endif(WIN32)
-        endforeach(SHADER)
-        # if compiling for visual studio, also use configure file for each project (specifically to set up working directory)
-        if(MSVC)
-            configure_file(${CMAKE_SOURCE_DIR}/configuration/visualstudio.vcxproj.user.in ${CMAKE_CURRENT_BINARY_DIR}/${NAME}.vcxproj.user @ONLY)
-        endif(MSVC)
-    endforeach(DEMO)
-endforeach(CHAPTER)
+
+# Add source files
+file(GLOB_RECURSE SOURCE_FILES 
+	${CMAKE_SOURCE_DIR}/src/*.c
+  ${CMAKE_SOURCE_DIR}/src/*.cpp
+  ${CMAKE_SOURCE_DIR}/src/*.fs
+  ${CMAKE_SOURCE_DIR}/src/*.gs
+  ${CMAKE_SOURCE_DIR}/src/*.vs)
+	
+# Add header files
+file(GLOB_RECURSE HEADER_FILES 
+	${CMAKE_SOURCE_DIR}/src/*.h
+	${CMAKE_SOURCE_DIR}/src/*.hpp)
+
+# Define the executable
+add_executable(${PROJECT_NAME} ${HEADER_FILES} ${SOURCE_FILES})
+target_link_libraries(${PROJECT_NAME} ${LIBS})
+if(WIN32)
+set_target_properties(${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/${PROJECT_NAME}")
+elseif(UNIX AND NOT APPLE)
+set_target_properties(${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/bin/${PROJECT_NAME}")
+elseif(APPLE)
+set_target_properties(${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/bin/${PROJECT_NAME}")
+set_target_properties(${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_CURRENT_BINARY_DIR}/bin/${PROJECT_NAME}")
+set_target_properties(${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_CURRENT_BINARY_DIR}/bin/${PROJECT_NAME}")
+endif(WIN32)
+
+file(GLOB SHADERS
+${CMAKE_SOURCE_DIR}/src/*.fs
+${CMAKE_SOURCE_DIR}/src/*.vs
+${CMAKE_SOURCE_DIR}/src/*.gs
+)
+
+file(GLOB DLLS
+${CMAKE_SOURCE_DIR}/dlls/*.dll
+)
+
+foreach(SHADER ${SHADERS})
+if(WIN32)
+    # configure_file(${SHADER} "test")
+    add_custom_command(TARGET ${PROJECT_NAME} PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${SHADER} $<TARGET_FILE_DIR:${PROJECT_NAME}>)
+    foreach(DLL ${DLLS})
+    add_custom_command(TARGET ${PROJECT_NAME} PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${DLL} $<TARGET_FILE_DIR:${PROJECT_NAME}>)
+    endforeach(DLL)
+elseif(UNIX AND NOT APPLE)
+    file(COPY ${SHADER} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/bin/${PROJECT_NAME})
+elseif(APPLE)
+    # create symbolic link for *.vs *.fs *.gs
+    get_filename_component(SHADERNAME ${SHADER} PROJECT_NAME)
+    makeLink(${SHADER} ${CMAKE_CURRENT_BINARY_DIR}/bin/${CHAPTER}/${SHADERNAME} ${PROJECT_NAME})
+endif(WIN32)
+endforeach(SHADER)
+
+if(MSVC)
+configure_file(${CMAKE_SOURCE_DIR}/configuration/visualstudio.vcxproj.user.in ${CMAKE_CURRENT_BINARY_DIR}/${NAME}.vcxproj.user @ONLY)
+endif(MSVC)
+
+
 
 include_directories(${CMAKE_SOURCE_DIR}/includes)
