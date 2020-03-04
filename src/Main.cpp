@@ -90,7 +90,12 @@ int main()
     Model ourModel(FileSystem::getPath("resources/objects/nanosuit/nanosuit.obj"));
 
 	//SetUp Fbo
+    //Scene View Settings
+    int SceneViewHeight = SCR_HEIGHT/2;
+    int SceneViewWidth = SCR_WIDTH/2;
 	SceneViewFbo = new cFBO();
+	std::string FboErr;
+	SceneViewFbo->init(SceneViewWidth, SceneViewHeight, FboErr);
     
 	// Setup Dear ImGui context
 	IMGUI_CHECKVERSION();
@@ -102,9 +107,7 @@ int main()
 	ImGui::StyleColorsDark();
 	bool show_demo_window = true;
 
-	//Scene View Settings
-	int SceneViewHeight = SCR_HEIGHT/2;
-	int SceneViewWidth = SCR_WIDTH/2;
+
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window))
@@ -124,6 +127,7 @@ int main()
         // -----
         processInput(window);
 
+        SceneViewFbo->bindBuffer();
         // render
         // ------
         glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
@@ -145,10 +149,13 @@ int main()
         ourShader.setMat4("model", model);
         ourModel.Draw(ourShader);
 
+        SceneViewFbo->unbindBuffer();
+
 		ImGui::ShowDemoWindow();
 
         ImVec2 VecScreen(SceneViewWidth, SceneViewHeight);
         ImGui::SetNextWindowSize(VecScreen);
+        ImGui::Image((void*)SceneViewFbo->colourTexture_0_ID, VecScreen, ImVec2(0,1), ImVec2(1,0));
 
 		ImGui::Begin("Main Window");
 		ImGui::End();
