@@ -130,7 +130,7 @@ int main()
         SceneViewFbo->bindBuffer();
         // render
         // ------
-        glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
+        glClearColor(0.4f, 0.2f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // don't forget to enable shader before setting uniforms
@@ -149,15 +149,15 @@ int main()
         ourShader.setMat4("model", model);
         ourModel.Draw(ourShader);
 
-        SceneViewFbo->unbindBuffer();
 
 		ImGui::ShowDemoWindow();
 
         ImVec2 VecScreen(SceneViewWidth, SceneViewHeight);
         ImGui::SetNextWindowSize(VecScreen);
-        ImGui::Image((void*)SceneViewFbo->colourTexture_0_ID, VecScreen, ImVec2(0,1), ImVec2(1,0));
+        
 
 		ImGui::Begin("Main Window");
+		ImGui::Image((void*)SceneViewFbo->colourTexture_0_ID, VecScreen, ImVec2(0, 1), ImVec2(1, 0));
 		ImGui::End();
 
 		//// 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
@@ -176,6 +176,10 @@ int main()
 		//}
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
+		SceneViewFbo->unbindBuffer();
+
+		glClearColor(0.5f, 0.5f, 0.2f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
