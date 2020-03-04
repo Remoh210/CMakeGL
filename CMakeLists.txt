@@ -122,8 +122,8 @@ elseif(UNIX AND NOT APPLE)
     file(COPY ${SHADER} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/bin/${PROJECT_NAME})
 elseif(APPLE)
     # create symbolic link for *.vs *.fs *.gs
-    get_filename_component(SHADERNAME ${SHADER} PROJECT_NAME)
-    makeLink(${SHADER} ${CMAKE_CURRENT_BINARY_DIR}/bin/${CHAPTER}/${SHADERNAME} ${PROJECT_NAME})
+    get_filename_component(SHADERNAME ${SHADER} NAME)
+    makeLink(${SHADER} ${CMAKE_CURRENT_BINARY_DIR}/bin/${PROJECT_NAME} NAME)
 endif(WIN32)
 endforeach(SHADER)
 
