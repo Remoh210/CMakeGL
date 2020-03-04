@@ -17,15 +17,13 @@
 #include <iostream>
 
 
-
-
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
 
 // settings
-const unsigned int SCR_WIDTH = 800;
+const unsigned int SCR_WIDTH = 1000;
 const unsigned int SCR_HEIGHT = 600;
 
 // camera
@@ -66,7 +64,7 @@ int main()
     glfwSetScrollCallback(window, scroll_callback);
 
     // tell GLFW to capture our mouse
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
     // glad: load all OpenGL function pointers
     // ---------------------------------------
@@ -98,6 +96,10 @@ int main()
 	ImGui_ImplOpenGL3_Init("#version 130");
 	ImGui::StyleColorsDark();
 	bool show_demo_window = true;
+
+	//Scene View Settings
+	int SceneViewHeight = SCR_HEIGHT/2;
+	int SceneViewWidth = SCR_WIDTH/2;
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window))
@@ -107,10 +109,6 @@ int main()
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 
-		ImVec2 VecScreen(SCR_WIDTH, SCR_HEIGHT);
-		ImVec2 VecPos(0, 0);
-		ImGui::SetNextWindowSize(VecScreen);
-		ImGui::SetNextWindowPos(VecPos);
         // per-frame time logic
         // --------------------
         float currentFrame = glfwGetTime();
@@ -143,6 +141,10 @@ int main()
         ourModel.Draw(ourShader);
 
 		ImGui::ShowDemoWindow();
+
+        ImVec2 VecScreen(SceneViewWidth, SceneViewHeight);
+        ImGui::SetNextWindowSize(VecScreen);
+
 		ImGui::Begin("Main Window");
 		ImGui::End();
 
@@ -191,6 +193,11 @@ void processInput(GLFWwindow *window)
         camera.ProcessKeyboard(LEFT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         camera.ProcessKeyboard(RIGHT, deltaTime);
+
+    if (glfwGetKey(window, GLFW_KEY_BACKSPACE) == GLFW_PRESS)
+        camera.bActive = false;
+    if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS)
+        camera.bActive = true;
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
