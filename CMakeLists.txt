@@ -58,7 +58,7 @@ configure_file(configuration/root_directory.h.in configuration/root_directory.h)
 include_directories(${CMAKE_BINARY_DIR}/configuration)
 
 # first create relevant static libraries requried for other projects
-add_library(STB_IMAGE "src/ThirdParty/stb_image.cpp")
+add_library(STB_IMAGE "src/thirdParty/stb_image.cpp")
 set(LIBS ${LIBS} STB_IMAGE)
 
 
