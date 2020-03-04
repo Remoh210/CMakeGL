@@ -1,5 +1,5 @@
-cmake_minimum_required (VERSION 2.8)
-cmake_policy(VERSION 2.8)
+cmake_minimum_required (VERSION 3.7)
+cmake_policy(VERSION 3.7)
 
 project (CMakeGL)
 
@@ -61,6 +61,7 @@ include_directories(${CMAKE_BINARY_DIR}/configuration)
 add_library(STB_IMAGE "src/thirdParty/stb_image.cpp")
 set(LIBS ${LIBS} STB_IMAGE)
 
+set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY  VS_STARTUP_PROJECT ${PROJECT_NAME})
 
 #set (imgui_headers ${CMAKE_SOURCE_DIR}/includes/imgui/imconfig.h ${CMAKE_SOURCE_DIR}/includes/imgui/imgui.h ${CMAKE_SOURCE_DIR}/includes/imgui/imgui_impl_glfw.h 
 #${CMAKE_SOURCE_DIR}/includes/imgui/imgui_impl_opengl3.h ${CMAKE_SOURCE_DIR}/includes/imgui/imgui_internal.h ${CMAKE_SOURCE_DIR}/includes/imgui/imstb_rectpack.h ${CMAKE_SOURCE_DIR}/includes/imgui/imstb_textedit.h ${CMAKE_SOURCE_DIR}/includes/imgui/imstb_truetype.h)

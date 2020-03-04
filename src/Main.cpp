@@ -16,6 +16,7 @@
 
 #include <iostream>
 
+#include "core/fbo/cFBO.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -35,6 +36,8 @@ bool firstMouse = true;
 // timing
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
+
+cFBO* SceneViewFbo = nullptr;
 
 int main()
 {
@@ -86,6 +89,8 @@ int main()
     // -----------
     Model ourModel(FileSystem::getPath("resources/objects/nanosuit/nanosuit.obj"));
 
+	//SetUp Fbo
+	SceneViewFbo = new cFBO();
     
 	// Setup Dear ImGui context
 	IMGUI_CHECKVERSION();
