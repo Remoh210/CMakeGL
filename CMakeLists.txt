@@ -62,10 +62,10 @@ add_library(STB_IMAGE "src/ThirdParty/stb_image.cpp")
 set(LIBS ${LIBS} STB_IMAGE)
 
 
-set (imgui_headers ${CMAKE_SOURCE_DIR}/includes/imgui/imconfig.h ${CMAKE_SOURCE_DIR}/includes/imgui/imgui.h ${CMAKE_SOURCE_DIR}/includes/imgui/imgui_impl_glfw.h 
-${CMAKE_SOURCE_DIR}/includes/imgui/imgui_impl_opengl3.h ${CMAKE_SOURCE_DIR}/includes/imgui/imgui_internal.h ${CMAKE_SOURCE_DIR}/includes/imgui/imstb_rectpack.h ${CMAKE_SOURCE_DIR}/includes/imgui/imstb_textedit.h ${CMAKE_SOURCE_DIR}/includes/imgui/imstb_truetype.h)
-set (imgui_sources ${CMAKE_SOURCE_DIR}/includes/imgui/imgui.cpp ${CMAKE_SOURCE_DIR}/includes/imgui/imgui_demo.cpp ${CMAKE_SOURCE_DIR}/includes/imgui/imgui_draw.cpp ${CMAKE_SOURCE_DIR}/includes/imgui/imgui_impl_glfw.cpp ${CMAKE_SOURCE_DIR}/includes/imgui/imgui_impl_opengl3.cpp ${CMAKE_SOURCE_DIR}/includes/imgui/imgui_widgets.cpp)
-add_library(ImGui STATIC ${imgui_sources} ${imgui_headers})
+#set (imgui_headers ${CMAKE_SOURCE_DIR}/includes/imgui/imconfig.h ${CMAKE_SOURCE_DIR}/includes/imgui/imgui.h ${CMAKE_SOURCE_DIR}/includes/imgui/imgui_impl_glfw.h 
+#${CMAKE_SOURCE_DIR}/includes/imgui/imgui_impl_opengl3.h ${CMAKE_SOURCE_DIR}/includes/imgui/imgui_internal.h ${CMAKE_SOURCE_DIR}/includes/imgui/imstb_rectpack.h ${CMAKE_SOURCE_DIR}/includes/imgui/imstb_textedit.h ${CMAKE_SOURCE_DIR}/includes/imgui/imstb_truetype.h)
+#set (imgui_sources ${CMAKE_SOURCE_DIR}/includes/imgui/imgui.cpp ${CMAKE_SOURCE_DIR}/includes/imgui/imgui_demo.cpp ${CMAKE_SOURCE_DIR}/includes/imgui/imgui_draw.cpp ${CMAKE_SOURCE_DIR}/includes/imgui/imgui_impl_glfw.cpp ${CMAKE_SOURCE_DIR}/includes/imgui/imgui_impl_opengl3.cpp ${CMAKE_SOURCE_DIR}/includes/imgui/imgui_widgets.cpp)
+#add_library(ImGui STATIC ${imgui_sources} ${imgui_headers})
 
 add_library(GLAD "src/thirdParty/glad.c")
 set(LIBS ${LIBS} GLAD)
