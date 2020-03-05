@@ -37,7 +37,38 @@ bool firstMouse = true;
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
-cFBO* SceneViewFbo = nullptr;
+//FBO
+cFBO* GBuffer = nullptr;
+cFBO* SceneViewFBO = nullptr;
+//Put in a seopareta Class
+unsigned int quadVAO = 0;
+unsigned int quadVBO;
+void renderQuad()
+{
+	if (quadVAO == 0)
+	{
+		float quadVertices[] = {
+			// positions        // texture Coords
+			-1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
+			-1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+			 1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
+			 1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+		};
+		// setup plane VAO
+		glGenVertexArrays(1, &quadVAO);
+		glGenBuffers(1, &quadVBO);
+		glBindVertexArray(quadVAO);
+		glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+	}
+	glBindVertexArray(quadVAO);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	glBindVertexArray(0);
+}
 
 int main()
 {
@@ -77,25 +108,70 @@ int main()
         return -1;
     }
 
-    // configure global opengl state
-    // -----------------------------
-    glEnable(GL_DEPTH_TEST);
 
-    // build and compile shaders
-    // -------------------------
-    Shader ourShader("1.model_loading.vs", "1.model_loading.fs");
+
+	// configure global opengl state
+	// -----------------------------
+	glEnable(GL_DEPTH_TEST);
+
+	// build and compile shaders
+	// -------------------------
+	Shader shaderGeometryPass("8.1.g_buffer.vs", "8.1.g_buffer.fs");
+	Shader shaderLightingPass("8.1.deferred_shading.vs", "8.1.deferred_shading.fs");
+	Shader shaderLightBox("8.1.deferred_light_box.vs", "8.1.deferred_light_box.fs");
 
     // load models
     // -----------
-    Model ourModel(FileSystem::getPath("resources/objects/nanosuit/nanosuit.obj"));
+	Model nanosuit(FileSystem::getPath("resources/objects/nanosuit/nanosuit.obj"));
+
+	std::vector<glm::vec3> objectPositions;
+	objectPositions.push_back(glm::vec3(-3.0, -3.0, -3.0));
+	objectPositions.push_back(glm::vec3(0.0, -3.0, -3.0));
+	objectPositions.push_back(glm::vec3(3.0, -3.0, -3.0));
+	objectPositions.push_back(glm::vec3(-3.0, -3.0, 0.0));
+	objectPositions.push_back(glm::vec3(0.0, -3.0, 0.0));
+	objectPositions.push_back(glm::vec3(3.0, -3.0, 0.0));
+	objectPositions.push_back(glm::vec3(-3.0, -3.0, 3.0));
+	objectPositions.push_back(glm::vec3(0.0, -3.0, 3.0));
+	objectPositions.push_back(glm::vec3(3.0, -3.0, 3.0));
 
 	//SetUp Fbo
-    //Scene View Settings
-    int SceneViewHeight = SCR_HEIGHT/2;
-    int SceneViewWidth = SCR_WIDTH/2;
-	SceneViewFbo = new cFBO();
+	//Scene View Settings
+	int SceneViewHeight = SCR_HEIGHT / 2;
+	int SceneViewWidth = SCR_WIDTH / 2;
+	GBuffer = new cFBO();
 	std::string FboErr;
-	SceneViewFbo->init(SceneViewWidth, SceneViewHeight, FboErr);
+	GBuffer->init(SceneViewWidth, SceneViewHeight, FboErr);
+
+	SceneViewFBO = new cFBO();
+	SceneViewFBO->init(SceneViewWidth, SceneViewHeight, FboErr);
+
+	// lighting info
+	// -------------
+	const unsigned int NR_LIGHTS = 32;
+	std::vector<glm::vec3> lightPositions;
+	std::vector<glm::vec3> lightColors;
+	srand(13);
+	for (unsigned int i = 0; i < NR_LIGHTS; i++)
+	{
+		// calculate slightly random offsets
+		float xPos = ((rand() % 100) / 100.0) * 6.0 - 3.0;
+		float yPos = ((rand() % 100) / 100.0) * 6.0 - 4.0;
+		float zPos = ((rand() % 100) / 100.0) * 6.0 - 3.0;
+		lightPositions.push_back(glm::vec3(xPos, yPos, zPos));
+		// also calculate random color
+		float rColor = ((rand() % 100) / 200.0f) + 0.5; // between 0.5 and 1.0
+		float gColor = ((rand() % 100) / 200.0f) + 0.5; // between 0.5 and 1.0
+		float bColor = ((rand() % 100) / 200.0f) + 0.5; // between 0.5 and 1.0
+		lightColors.push_back(glm::vec3(rColor, gColor, bColor));
+	}
+
+
+	shaderLightingPass.use();
+	shaderLightingPass.setInt("gPosition", 0);
+	shaderLightingPass.setInt("gNormal", 1);
+	shaderLightingPass.setInt("gAlbedoSpec", 2);
+
     
 	// Setup Dear ImGui context
 	IMGUI_CHECKVERSION();
@@ -127,59 +203,79 @@ int main()
         // -----
         processInput(window);
 
-        SceneViewFbo->bindBuffer();
-        // render
-        // ------
-        glClearColor(0.4f, 0.2f, 0.1f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // don't forget to enable shader before setting uniforms
-        ourShader.use();
+        
+		// render
+		// ------
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // view/projection transformations
-        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-        glm::mat4 view = camera.GetViewMatrix();
-        ourShader.setMat4("projection", projection);
-        ourShader.setMat4("view", view);
+		// 1. geometry pass: render scene's geometry/color data into gbuffer
+		// -----------------------------------------------------------------
+		GBuffer->bindBuffer();
+		glViewport(0, 0, SceneViewWidth, SceneViewHeight);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SceneViewWidth / (float)SceneViewHeight, 0.1f, 100.0f);
+		glm::mat4 view = camera.GetViewMatrix();
+		glm::mat4 model = glm::mat4(1.0f);
+		shaderGeometryPass.use();
+		shaderGeometryPass.setMat4("projection", projection);
+		shaderGeometryPass.setMat4("view", view);
+		for (unsigned int i = 0; i < objectPositions.size(); i++)
+		{
+			model = glm::mat4(1.0f);
+			model = glm::translate(model, objectPositions[i]);
+			model = glm::scale(model, glm::vec3(0.25f));
+			shaderGeometryPass.setMat4("model", model);
+			nanosuit.Draw(shaderGeometryPass);
+		}
 
-        // render the loaded model
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f, -1.75f, 0.0f)); // translate it down so it's at the center of the scene
-        model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));	// it's a bit too big for our scene, so scale it down
-        ourShader.setMat4("model", model);
-        ourModel.Draw(ourShader);
+		SceneViewFBO->bindBuffer();
 
+		glViewport(0, 0, SceneViewWidth, SceneViewHeight);
+
+		// 2. lighting pass: calculate lighting by iterating over a screen filled quad pixel-by-pixel using the gbuffer's content.
+		// -----------------------------------------------------------------------------------------------------------------------
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		shaderLightingPass.use();
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, GBuffer->vertexWorldPos_2_ID);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, GBuffer->normalTexture_1_ID);
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, GBuffer->colourTexture_0_ID);
+
+		// send light relevant uniforms
+		for (unsigned int i = 0; i < lightPositions.size(); i++)
+		{
+			shaderLightingPass.setVec3("lights[" + std::to_string(i) + "].Position", lightPositions[i]);
+			shaderLightingPass.setVec3("lights[" + std::to_string(i) + "].Color", lightColors[i]);
+			// update attenuation parameters and calculate radius
+			const float constant = 1.0; // note that we don't send this to the shader, we assume it is always 1.0 (in our case)
+			const float linear = 0.7;
+			const float quadratic = 1.8;
+			shaderLightingPass.setFloat("lights[" + std::to_string(i) + "].Linear", linear);
+			shaderLightingPass.setFloat("lights[" + std::to_string(i) + "].Quadratic", quadratic);
+		}
+		shaderLightingPass.setVec3("viewPos", camera.Position);
+		// finally render quad
+		renderQuad();
+
+
+		SceneViewFBO->unbindBuffer();
+
+		
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		ImGui::ShowDemoWindow();
 
-        ImVec2 VecScreen(SceneViewWidth, SceneViewHeight);
-        ImGui::SetNextWindowSize(VecScreen);
-        
+		ImVec2 VecScreen(SceneViewWidth, SceneViewHeight);
+		ImGui::SetNextWindowSize(VecScreen);
 
 		ImGui::Begin("Main Window");
-		ImGui::Image((void*)SceneViewFbo->colourTexture_0_ID, VecScreen, ImVec2(0, 1), ImVec2(1, 0));
+		ImGui::Image((void*)SceneViewFBO->colourTexture_0_ID, VecScreen, ImVec2(0, 1), ImVec2(1, 0));
 		ImGui::End();
-
-		//// 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
-		//{
-		//	static float f = 0.0f;
-		//	static int counter = 0;
-		//	ImGui::Begin("Settings");                          // Create a window called "Hello, world!" and append into it.
-
-		//	ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-
-		//	ImGui::SameLine();
-		//	ImGui::Text("counter = %d", counter);
-
-		//	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-		//	ImGui::End();
-		//}
-        // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
-        // -------------------------------------------------------------------------------
-		SceneViewFbo->unbindBuffer();
-
-		glClearColor(0.5f, 0.5f, 0.2f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -222,7 +318,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     // make sure the viewport matches the new window dimensions; note that width and 
     // height will be significantly larger than specified on retina displays.
-    glViewport(0, 0, width, height);
+    glViewport(0, 0, width/2, height/2);
 }
 
 // glfw: whenever the mouse moves, this callback is called

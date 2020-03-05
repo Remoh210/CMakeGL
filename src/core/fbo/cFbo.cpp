@@ -1,5 +1,5 @@
 #include "cFBO.h"
-
+#include <iostream>
 
 // Calls shutdown(), then init()
 bool cFBO::reset(int width, int height, std::string &error)
@@ -28,103 +28,44 @@ bool cFBO::shutdown(void)
 
 bool cFBO::init(int width, int height, std::string &error)
 {
-	this->width = width;
-	this->height = height;
-
-	//	glCreateFramebuffers(1, &( this->ID ) );	// GL 4.5		//g_FBO
-	glGenFramebuffers(1, &(this->ID));		
+	glGenFramebuffers(1, &this->ID);
 	glBindFramebuffer(GL_FRAMEBUFFER, this->ID);
-
-	//************************************************************
-		// Create the colour buffer (texture)
-	glGenTextures(1, &(this->colourTexture_0_ID));		//g_FBO_colourTexture
-	glBindTexture(GL_TEXTURE_2D, this->colourTexture_0_ID);
-
-
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	//***************************************************************
-	//************************************************************
-	// Create the NORMAL buffer (texture)
-	glGenTextures(1, &(this->normalTexture_1_ID));		//g_FBO_colourTexture
-	glBindTexture(GL_TEXTURE_2D, this->normalTexture_1_ID);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	
-	// Create the Vertex World position buffer (texture)
-	glGenTextures(1, &(this->vertexWorldPos_2_ID));		//g_FBO_colourTexture
+	// position color buffer
+	glGenTextures(1, &this->vertexWorldPos_2_ID);
 	glBindTexture(GL_TEXTURE_2D, this->vertexWorldPos_2_ID);
-
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	//***************************************************************
-
-
-	// Create the depth buffer (texture)
-	glGenTextures(1, &(this->depthTexture_ID));			//g_FBO_depthTexture
-	glBindTexture(GL_TEXTURE_2D, this->depthTexture_ID);
-
-
-	glFramebufferTexture(GL_FRAMEBUFFER,
-		GL_COLOR_ATTACHMENT0,			// Colour goes to #0
-		this->colourTexture_0_ID, 0);
-
-	glFramebufferTexture(GL_FRAMEBUFFER,
-		GL_COLOR_ATTACHMENT1,			// Normal goes to #1
-		this->normalTexture_1_ID, 0);
-
-	glFramebufferTexture(GL_FRAMEBUFFER,
-		GL_COLOR_ATTACHMENT2,			// Vertex world position #2
-		this->vertexWorldPos_2_ID, 0);
-
-	//	glFramebufferTexture(GL_FRAMEBUFFER,
-	//						 GL_DEPTH_ATTACHMENT,
-	//						 this->depthTexture_ID, 0);
-	glFramebufferTexture(GL_FRAMEBUFFER,
-		GL_DEPTH_STENCIL_ATTACHMENT,
-		this->depthTexture_ID, 0);
-
-	static const GLenum draw_bufers[] =
-	{
-		GL_COLOR_ATTACHMENT0,
-		GL_COLOR_ATTACHMENT1,
-		GL_COLOR_ATTACHMENT2
-	};
-	glDrawBuffers(3, draw_bufers);		// There are 3 outputs now
-
-	// ***************************************************************
-
-
-
-
-	// ADD ONE MORE THING...
-	bool bFrameBufferIsGoodToGo = true;
-
-	switch (glCheckFramebufferStatus(GL_FRAMEBUFFER))
-	{
-	case GL_FRAMEBUFFER_COMPLETE:
-		bFrameBufferIsGoodToGo = true;
-		break;
-
-	case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
-		error = "GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT";
-		bFrameBufferIsGoodToGo = false;
-		break;
-		//	case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS:
-	case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
-	case GL_FRAMEBUFFER_UNSUPPORTED:
-	default:
-		bFrameBufferIsGoodToGo = false;
-		break;
-	}//switch ( glCheckFramebufferStatus(GL_FRAMEBUFFER) )
-
-	// Point back to default frame buffer
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, this->vertexWorldPos_2_ID, 0);
+	// normal color buffer
+	glGenTextures(1, &this->normalTexture_1_ID);
+	glBindTexture(GL_TEXTURE_2D, this->normalTexture_1_ID);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, this->normalTexture_1_ID, 0);
+	// color + specular color buffer
+	glGenTextures(1, &this->colourTexture_0_ID);
+	glBindTexture(GL_TEXTURE_2D, this->colourTexture_0_ID);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, this->colourTexture_0_ID, 0);
+	// tell OpenGL which color attachments we'll use (of this framebuffer) for rendering 
+	unsigned int attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
+	glDrawBuffers(3, attachments);
+	// create and attach depth buffer (renderbuffer)
+	unsigned int rboDepth;
+	glGenRenderbuffers(1, &rboDepth);
+	glBindRenderbuffer(GL_RENDERBUFFER, rboDepth);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rboDepth);
+	// finally check if framebuffer is complete
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		std::cout << "Framebuffer not complete!" << std::endl;
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	return bFrameBufferIsGoodToGo;
+	return true;
 }
 
 void cFBO::clearColourBuffer(int bufferindex)
