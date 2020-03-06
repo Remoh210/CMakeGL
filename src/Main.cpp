@@ -28,8 +28,9 @@ void processInput(GLFWwindow *window);
 unsigned int SCR_WIDTH = 1000;
 unsigned int SCR_HEIGHT = 600;
 
-int SceneViewHeight = SCR_HEIGHT / 2;
-int SceneViewWidth = SCR_WIDTH / 2;
+float SceneViewScale = 0.65;
+int SceneViewHeight = SCR_HEIGHT * SceneViewScale;
+int SceneViewWidth = SCR_WIDTH * SceneViewScale;
 
 // camera
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
@@ -272,12 +273,22 @@ int main()
 
 		ImGui::ShowDemoWindow();
 
+
 		ImVec2 VecScreen(SceneViewWidth, SceneViewHeight);
+		VecScreen.y += 20;
 		ImGui::SetNextWindowSize(VecScreen);
 
-		ImGui::Begin("Main Window");
-		ImGui::Image((void*)SceneViewFBO->colourTexture_0_ID, VecScreen, ImVec2(0, 1), ImVec2(1, 0));
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+		ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 1.0f);
+
+		ImGui::Begin("Scene View");
+		ImGui::Image((void*)SceneViewFBO->colourTexture_0_ID, ImVec2(SceneViewWidth, SceneViewHeight), ImVec2(0, 1), ImVec2(1, 0));
 		ImGui::End();
+
+
+
+		ImGui::PopStyleVar();
+		ImGui::PopStyleVar();
 
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -328,8 +339,8 @@ void window_size_callback(GLFWwindow* window, int width, int height)
     SCR_WIDTH = width;
     SCR_HEIGHT = height;
 
-    SceneViewHeight = SCR_HEIGHT / 2;
-    SceneViewWidth = SCR_WIDTH / 2;
+    SceneViewHeight = SCR_HEIGHT * SceneViewScale;
+    SceneViewWidth = SCR_WIDTH * SceneViewScale;
     std::string err = "";
     GBuffer->reset(SceneViewWidth, SceneViewHeight, err);
     if(!err.empty())
