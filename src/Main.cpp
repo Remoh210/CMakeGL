@@ -18,14 +18,18 @@
 
 #include "core/fbo/cFBO.h"
 
+void window_size_callback(GLFWwindow* window, int width, int height);
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
 
 // settings
-const unsigned int SCR_WIDTH = 1000;
-const unsigned int SCR_HEIGHT = 600;
+unsigned int SCR_WIDTH = 1000;
+unsigned int SCR_HEIGHT = 600;
+
+int SceneViewHeight = SCR_HEIGHT / 2;
+int SceneViewWidth = SCR_WIDTH / 2;
 
 // camera
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
@@ -93,6 +97,7 @@ int main()
         return -1;
     }
     glfwMakeContextCurrent(window);
+    glfwSetWindowSizeCallback(window, window_size_callback);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
@@ -135,10 +140,7 @@ int main()
 	objectPositions.push_back(glm::vec3(0.0, -3.0, 3.0));
 	objectPositions.push_back(glm::vec3(3.0, -3.0, 3.0));
 
-	//SetUp Fbo
-	//Scene View Settings
-	int SceneViewHeight = SCR_HEIGHT / 2;
-	int SceneViewWidth = SCR_WIDTH / 2;
+	//SetUp Fbos
 	GBuffer = new cFBO();
 	std::string FboErr;
 	GBuffer->init(SceneViewWidth, SceneViewHeight, FboErr);
@@ -307,9 +309,41 @@ void processInput(GLFWwindow *window)
         camera.ProcessKeyboard(RIGHT, deltaTime);
 
     if (glfwGetKey(window, GLFW_KEY_BACKSPACE) == GLFW_PRESS)
+    {
         camera.bActive = false;
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    }
+
     if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS)
+    {
         camera.bActive = true;
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    }
+
+}
+
+void window_size_callback(GLFWwindow* window, int width, int height)
+{
+    //glViewport(0, 0, width/2, height/2);
+    SCR_WIDTH = width;
+    SCR_HEIGHT = height;
+
+    SceneViewHeight = SCR_HEIGHT / 2;
+    SceneViewWidth = SCR_WIDTH / 2;
+    std::string err = "";
+    GBuffer->reset(SceneViewWidth, SceneViewHeight, err);
+    if(!err.empty())
+    {
+        std::printf(err.c_str());
+        err.clear();
+    }
+    SceneViewFBO->reset(SceneViewWidth, SceneViewHeight, err);
+    if(!err.empty())
+    {
+        std::printf(err.c_str());
+        err.clear();
+    }
+
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
@@ -318,7 +352,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     // make sure the viewport matches the new window dimensions; note that width and 
     // height will be significantly larger than specified on retina displays.
-    glViewport(0, 0, width/2, height/2);
+
 }
 
 // glfw: whenever the mouse moves, this callback is called
