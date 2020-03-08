@@ -1,9 +1,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
- 
-#include "thirdParty/imgui/imgui.h"
-#include "thirdParty/imgui/imgui_impl_glfw.h"
-#include "thirdParty/imgui/imgui_impl_opengl3.h"
+
+#include "core/UI/UI.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -41,6 +39,9 @@ bool firstMouse = true;
 // timing
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
+
+//UI
+UI* EditorUI = nullptr;
 
 //FBO
 cFBO* GBuffer = nullptr;
@@ -90,7 +91,7 @@ int main()
 
     // glfw window creation
     // --------------------
-    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Editor", NULL, NULL);
     if (window == NULL)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
@@ -176,25 +177,13 @@ int main()
 	shaderLightingPass.setInt("gAlbedoSpec", 2);
 
     
-	// Setup Dear ImGui context
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-    // draw in wireframe
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	ImGui_ImplGlfw_InitForOpenGL(window, true);
-	ImGui_ImplOpenGL3_Init("#version 130");
-	ImGui::StyleColorsDark();
-	bool show_demo_window = true;
+    EditorUI = new UI(ImVec2(SCR_WIDTH, SCR_HEIGHT), ImVec2(SceneViewWidth, SceneViewHeight), SceneViewFBO, window);
 
 
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window))
     {
-		// Start the Dear ImGui frame
-		ImGui_ImplOpenGL3_NewFrame();
-		ImGui_ImplGlfw_NewFrame();
-		ImGui::NewFrame();
 
         // per-frame time logic
         // --------------------
@@ -206,7 +195,7 @@ int main()
         // -----
         processInput(window);
 
-
+        EditorUI->DrawUI();
         
 		// render
 		// ------
@@ -271,27 +260,9 @@ int main()
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		ImGui::ShowDemoWindow();
 
-
-		ImVec2 VecScreen(SceneViewWidth, SceneViewHeight);
-		VecScreen.y += 20;
-		ImGui::SetNextWindowSize(VecScreen);
-
-		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-		ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 1.0f);
-
-		ImGui::Begin("Scene View");
-		ImGui::Image((void*)SceneViewFBO->colourTexture_0_ID, ImVec2(SceneViewWidth, SceneViewHeight), ImVec2(0, 1), ImVec2(1, 0));
-		ImGui::End();
-
-
-
-		ImGui::PopStyleVar();
-		ImGui::PopStyleVar();
-
-		ImGui::Render();
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        //UI->Render
+        EditorUI->RenderUI();
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -341,6 +312,9 @@ void window_size_callback(GLFWwindow* window, int width, int height)
 
     SceneViewHeight = SCR_HEIGHT * SceneViewScale;
     SceneViewWidth = SCR_WIDTH * SceneViewScale;
+
+    EditorUI->ResizeUI(SCR_WIDTH, SCR_HEIGHT);
+
     std::string err = "";
     GBuffer->reset(SceneViewWidth, SceneViewHeight, err);
     if(!err.empty())
@@ -354,6 +328,8 @@ void window_size_callback(GLFWwindow* window, int width, int height)
         std::printf(err.c_str());
         err.clear();
     }
+
+
 
 }
 
