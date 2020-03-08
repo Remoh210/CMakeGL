@@ -18,6 +18,7 @@
 
 void window_size_callback(GLFWwindow* window, int width, int height);
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void ResizeFBOs(int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
@@ -177,7 +178,7 @@ int main()
 	shaderLightingPass.setInt("gAlbedoSpec", 2);
 
     
-    EditorUI = new UI(ImVec2(SCR_WIDTH, SCR_HEIGHT), ImVec2(SceneViewWidth, SceneViewHeight), SceneViewFBO, window);
+    EditorUI = new UI(ImVec2(SCR_WIDTH, SCR_HEIGHT), ImVec2(SceneViewWidth, SceneViewHeight), SceneViewFBO, window, ResizeFBOs);
 
 
     // render loop
@@ -205,9 +206,9 @@ int main()
 		// 1. geometry pass: render scene's geometry/color data into gbuffer
 		// -----------------------------------------------------------------
 		GBuffer->bindBuffer();
-		glViewport(0, 0, SceneViewWidth, SceneViewHeight);
+		glViewport(0, 0, EditorUI->GetSceneViewSize().x, EditorUI->GetSceneViewSize().y);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SceneViewWidth / (float)SceneViewHeight, 0.1f, 100.0f);
+		glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)EditorUI->GetSceneViewSize().x / (float)EditorUI->GetSceneViewSize().y, 0.1f, 100.0f);
 		glm::mat4 view = camera.GetViewMatrix();
 		glm::mat4 model = glm::mat4(1.0f);
 		shaderGeometryPass.use();
@@ -224,7 +225,7 @@ int main()
 
 		SceneViewFBO->bindBuffer();
 
-		glViewport(0, 0, SceneViewWidth, SceneViewHeight);
+		glViewport(0, 0, EditorUI->GetSceneViewSize().x, EditorUI->GetSceneViewSize().y);
 
 		// 2. lighting pass: calculate lighting by iterating over a screen filled quad pixel-by-pixel using the gbuffer's content.
 		// -----------------------------------------------------------------------------------------------------------------------
@@ -310,26 +311,30 @@ void window_size_callback(GLFWwindow* window, int width, int height)
     SCR_WIDTH = width;
     SCR_HEIGHT = height;
 
-    SceneViewHeight = SCR_HEIGHT * SceneViewScale;
-    SceneViewWidth = SCR_WIDTH * SceneViewScale;
+    SceneViewHeight = SCR_HEIGHT * EditorUI->GetSceneScale();
+    SceneViewWidth = SCR_WIDTH * EditorUI->GetSceneScale();
 
     EditorUI->ResizeUI(SCR_WIDTH, SCR_HEIGHT);
 
-    std::string err = "";
-    GBuffer->reset(SceneViewWidth, SceneViewHeight, err);
-    if(!err.empty())
-    {
-        std::printf(err.c_str());
-        err.clear();
-    }
-    SceneViewFBO->reset(SceneViewWidth, SceneViewHeight, err);
-    if(!err.empty())
-    {
-        std::printf(err.c_str());
-        err.clear();
-    }
+	ResizeFBOs(SceneViewWidth, SceneViewHeight);
 
+}
 
+void ResizeFBOs(int width, int height)
+{
+	std::string err = "";
+	GBuffer->reset(width, height, err);
+	if (!err.empty())
+	{
+		std::printf(err.c_str());
+		err.clear();
+	}
+	SceneViewFBO->reset(width, height, err);
+	if (!err.empty())
+	{
+		std::printf(err.c_str());
+		err.clear();
+	}
 
 }
 

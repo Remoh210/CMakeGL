@@ -1,12 +1,18 @@
 #include "UI.h"
+#include <iostream>
 
-UI::UI(ImVec2 window_size, ImVec2 scene_view_size, cFBO* scene_fbo, GLFWwindow *window)
+
+UI::UI(ImVec2 window_size, ImVec2 scene_view_size, cFBO* scene_fbo, GLFWwindow* window, FBOResizeFunc resize_callback)
         :WindowSize(window_size),
-         SceneViewSize(scene_view_size),
-         SceneFBO(scene_fbo)
+		SceneViewSize(scene_view_size),
+        SceneFBO(scene_fbo),
+		Window(window),
+		ResizeCallbackFunc(resize_callback)
+		
 {
 
     SceneViewScale = 0.65;
+	bFullScreen = false;
 
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
@@ -35,14 +41,53 @@ void UI::DrawUI()
 
 void UI::DrawSceneEditor()
 {
-    ImVec2 VecScreen = SceneViewSize;
-    VecScreen.y += 20;
-    ImGui::SetNextWindowSize(VecScreen);
+	ImGuiWindowFlags window_flags = 0;
+	window_flags |= ImGuiWindowFlags_MenuBar;
+	window_flags |= ImGuiWindowFlags_NoResize;
+
+
+	ImVec2 VecScreen = SceneViewSize;
+	int VerticalSizeAdj = 45;
+	if (bFullScreen)
+	{
+		ImGui::SetNextWindowPos(ImVec2(0, 0));
+		window_flags |= ImGuiWindowFlags_NoTitleBar;
+		window_flags |= ImGuiWindowFlags_NoMove;
+		window_flags |= ImGuiWindowFlags_NoCollapse;
+		VerticalSizeAdj = 20;
+	}
+		
+	VecScreen.y += VerticalSizeAdj;
+
+	ImGui::SetNextWindowSize(VecScreen);
 
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
     ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 1.0f);
 
-    ImGui::Begin("Scene View");
+    ImGui::Begin("Scene View", nullptr, window_flags);
+
+	// Menu Bar
+	if (ImGui::BeginMenuBar())
+	{
+		if (ImGui::BeginMenu("File"))
+		{
+			ImGui::MenuItem("Save");
+			ImGui::MenuItem("Load");
+			ImGui::EndMenu();
+		}
+		if (ImGui::BeginMenu("View"))
+		{
+			if (ImGui::MenuItem("Full Screen", "Ctrl + F"))
+			{
+				ToggleFullscreen();
+			}
+			
+			ImGui::EndMenu();
+		}
+		ImGui::EndMenuBar();
+	}
+		
+
     ImGui::Image((void*)SceneFBO->colourTexture_0_ID, SceneViewSize, ImVec2(0, 1), ImVec2(1, 0));
     ImGui::End();
 
@@ -50,6 +95,8 @@ void UI::DrawSceneEditor()
 
     ImGui::PopStyleVar();
     ImGui::PopStyleVar();
+
+	ImGui::ShowDemoWindow();
 }
 
 void UI::RenderUI()
@@ -60,7 +107,33 @@ void UI::RenderUI()
 
 void UI::ResizeUI(int width, int height)
 {
+	WindowSize = ImVec2(width, height);
+
     int NewWidth = width * SceneViewScale;
     int NewHeight = height * SceneViewScale;
     SceneViewSize = ImVec2(NewWidth, NewHeight);
+}
+
+void UI::ToggleFullscreen()
+{
+	if (!bFullScreen)
+	{
+		ResizeUI(WindowSize.x, WindowSize.y);
+		SceneViewScaleCache = SceneViewScale;
+		SceneViewSize = WindowSize;
+		SceneViewScale = 1.0;
+		ResizeCallbackFunc(SceneViewSize.x, SceneViewSize.y);
+		bFullScreen = true;
+	}
+	else
+	{
+		SceneViewScale = SceneViewScaleCache;
+		ResizeUI(WindowSize.x, WindowSize.y);
+		ResizeCallbackFunc(SceneViewSize.x, SceneViewSize.y);
+		bFullScreen = false;
+	}
+
+	//Tell Application to change fbos' sizes
+	
+
 }
