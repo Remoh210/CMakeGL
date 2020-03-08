@@ -40,6 +40,6 @@ public:
     inline float GetSceneScale(){ return SceneViewScale; }
 	inline ImVec2 GetSceneViewSize() { return SceneViewSize; }
 	
-	void UI::RenderUI();
+	void RenderUI();
 };
 
