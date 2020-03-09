@@ -14,7 +14,11 @@ typedef void(*FBOResizeFunc)(int, int);
 class UI //Make it static class?
 {
 private:
+    void DrawMainBar();
     void DrawSceneEditor();
+    void DrawSceneTree();
+    void DrawInspector();
+    //void Draw();
 
 	ImVec2 WindowSize;
 	ImVec2 SceneViewSize;
