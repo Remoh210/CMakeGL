@@ -50,6 +50,9 @@ cFBO* SceneViewFBO = nullptr;
 //Put in a seopareta Class
 unsigned int quadVAO = 0;
 unsigned int quadVBO;
+
+glm::mat4 OldMVP(1.f); //For MotionBlur
+
 void renderQuad()
 {
 	if (quadVAO == 0)
@@ -219,8 +222,14 @@ int main()
 			model = glm::mat4(1.0f);
 			model = glm::translate(model, objectPositions[i]);
 			model = glm::scale(model, glm::vec3(0.25f));
+
+			glm::mat4 MVP = projection * view * model;
+			shaderGeometryPass.setMat4("MVP", MVP);
+			//shaderGeometryPass.setMat4("OldMVP", OldMVP);
 			shaderGeometryPass.setMat4("model", model);
 			nanosuit.Draw(shaderGeometryPass);
+
+			//OldMVP = MVP;
 		}
 
 		SceneViewFBO->bindBuffer();
