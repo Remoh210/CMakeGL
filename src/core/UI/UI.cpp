@@ -13,7 +13,7 @@ UI::UI(ImVec2 window_size, ImVec2 scene_view_size, cFBO* scene_fbo, GLFWwindow* 
 
     SceneViewScale = 0.65;
 	bFullScreen = false;
-
+	bShowSettings = false;
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -47,7 +47,13 @@ void UI::DrawUI()
 
     ImGui::Begin("Main", nullptr, main_window_flags);
 
-    DrawMainBar();// Main Window menu
+	// Main Window menu
+    DrawMainBar();
+	if (bShowSettings)
+	{
+		DrawSettings();
+	}
+	// Main Window menu 
 
     DrawSceneTree();
     ImGui::SameLine();
@@ -187,6 +193,11 @@ void UI::ToggleFullscreen()
 
 }
 
+void UI::ToggleSettingsWindow()
+{
+	bShowSettings = !bShowSettings;
+}
+
 void UI::DrawSceneTree()
 {
     ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.0f);
@@ -253,7 +264,7 @@ void UI::DrawMainBar()
             ImGui::MenuItem("Load");
 			if (ImGui::MenuItem("Settings"))
 			{
-				// OpenMenu Window
+				ToggleSettingsWindow();
 			}
             ImGui::EndMenu();
         }
@@ -277,4 +288,11 @@ void UI::DrawInspector()
     ImGui::BeginChild("SceneTree", ImVec2(WindowSize.x / 6.5, WindowSize.y / 1.5), true/*, window_flags*/);
     ImGui::EndChild();
     ImGui::PopStyleVar();
+}
+
+void UI::DrawSettings()
+{
+	ImGui::SetNextWindowSize(ImVec2(WindowSize.x/6, WindowSize.y/6));
+	ImGui::Begin("Settings");
+	ImGui::End();
 }

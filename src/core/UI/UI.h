@@ -31,6 +31,7 @@ private:
     void DrawSceneEditor();
     void DrawSceneTree();
     void DrawInspector();
+	void DrawSettings();
     //void Draw();
 
 	ImVec2 WindowSize;
@@ -43,8 +44,10 @@ private:
 	FBOResizeFunc ResizeCallbackFunc;
 
 	bool bFullScreen;
+	bool bShowSettings;
 
 	void ToggleFullscreen();
+	void ToggleSettingsWindow();
 
 	sPostProcessingSettings PostProcessingSettings;
 
