@@ -242,7 +242,6 @@ int main()
 			nanosuit.Draw(shaderGeometryPass);
 		}
 		
-
 		SceneViewFBO->bindBuffer();
 
 
@@ -291,7 +290,7 @@ int main()
         motionBlurPass.setMat4("VP", VP);
         motionBlurPass.setMat4("PreviousVP", OldVP);
 		motionBlurPass.setInt("BlurCycleCount", 5);
-		
+
         renderQuad();
 		
 		OldVP = VP;
