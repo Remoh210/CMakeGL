@@ -288,13 +288,9 @@ int main()
 		glBindTexture(GL_TEXTURE_2D, GBuffer->depthTexture_ID);
 
 
-
-
-        //glActiveTexture(GL_TEXTURE3);
-        //glBindTexture(GL_TEXTURE_2D, GBuffer->colourTexture_0_ID);
         motionBlurPass.setMat4("VP", VP);
         motionBlurPass.setMat4("PreviousVP", OldVP);
-
+		motionBlurPass.setInt("BlurCycleCount", 5);
 		
         renderQuad();
 		
@@ -377,6 +373,12 @@ void ResizeFBOs(int width, int height)
 		err.clear();
 	}
 	SceneViewFBO->reset(width, height, err);
+	if (!err.empty())
+	{
+		std::printf(err.c_str());
+		err.clear();
+	}
+	MotionBlurFBO->reset(width, height, err);
 	if (!err.empty())
 	{
 		std::printf(err.c_str());
