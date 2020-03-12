@@ -29,12 +29,12 @@ void main()
 	previousPos /= previousPos.w;
 	// Use this frame's position and last frame's to compute the pixel velocity.
 	vec2 velDif = currentPos.xy - previousPos.xy;
-	vec2 velocity = velDif / 2.f;
+	vec2 velocity = velDif / 10.f;
 	
 	// Get the initial color at this pixel.
 	vec2 NewTexCoor = TexCoords;
 	vec4 color = texture(gRenderedTex, NewTexCoor);
-	//NewTexCoor += velocity;
+	NewTexCoor += velocity;
 	for(int i = 1; i < BlurCycleCount; ++i, NewTexCoor += velocity)
 	{
 		// Sample the color buffer along the velocity vector.

@@ -289,12 +289,11 @@ int main()
 
         motionBlurPass.setMat4("VP", VP);
         motionBlurPass.setMat4("PreviousVP", OldVP);
-		motionBlurPass.setInt("BlurCycleCount", 5);
+		motionBlurPass.setInt("BlurCycleCount", 12);
 
         renderQuad();
 		
 		OldVP = VP;
-
 
 		MotionBlurFBO->unbindBuffer();
 
