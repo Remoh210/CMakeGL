@@ -11,6 +11,19 @@
 
 typedef void(*FBOResizeFunc)(int, int);
 
+
+struct sPostProcessingSettings
+{
+	sPostProcessingSettings()
+	{
+		BlurCycles = 10;
+		PixelVelocityMult = 0.1;
+	}
+
+	float PixelVelocityMult;
+	int BlurCycles;
+};
+
 class UI //Make it static class?
 {
 private:
@@ -33,6 +46,8 @@ private:
 
 	void ToggleFullscreen();
 
+	sPostProcessingSettings PostProcessingSettings;
+
 public:
     UI(ImVec2 window_size, ImVec2 scene_view_size, cFBO* scene_fbo, GLFWwindow* window, FBOResizeFunc resize_callback);
     ~UI();
@@ -44,6 +59,8 @@ public:
     inline float GetSceneScale(){ return SceneViewScale; }
 	inline ImVec2 GetSceneViewSize() { return SceneViewSize; }
 	
+	inline sPostProcessingSettings GetPostProcessingSettings() { return PostProcessingSettings; }
+
 	void RenderUI();
 };
 

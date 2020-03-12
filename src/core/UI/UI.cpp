@@ -251,6 +251,10 @@ void UI::DrawMainBar()
         {
             ImGui::MenuItem("Save");
             ImGui::MenuItem("Load");
+			if (ImGui::MenuItem("Settings"))
+			{
+				// OpenMenu Window
+			}
             ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("View"))
@@ -262,6 +266,7 @@ void UI::DrawMainBar()
 
             ImGui::EndMenu();
         }
+
         ImGui::EndMenuBar();
     }
 }

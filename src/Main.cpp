@@ -289,7 +289,8 @@ int main()
 
         motionBlurPass.setMat4("VP", VP);
         motionBlurPass.setMat4("PreviousVP", OldVP);
-		motionBlurPass.setInt("BlurCycleCount", 12);
+		motionBlurPass.setInt("BlurCycleCount", EditorUI->GetPostProcessingSettings().BlurCycles);
+		motionBlurPass.setFloat("VelocityMult", EditorUI->GetPostProcessingSettings().PixelVelocityMult);
 
         renderQuad();
 		
