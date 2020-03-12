@@ -185,11 +185,13 @@ int main()
 	shaderLightingPass.setInt("gNormal", 1);
 	shaderLightingPass.setInt("gAlbedoSpec", 2);
 
-    motionBlurPass.setInt("gScreenTex", 0);
-	motionBlurPass.setInt("gDepth", 1);
+	motionBlurPass.use();
+    motionBlurPass.setInt("gRenderedTex", 0);
+	motionBlurPass.setInt("gDepthTex", 1);
 
     
     EditorUI = new UI(ImVec2(SCR_WIDTH, SCR_HEIGHT), ImVec2(SceneViewWidth, SceneViewHeight), MotionBlurFBO, window, ResizeFBOs);
+
 
 
     // render loop
@@ -224,6 +226,7 @@ int main()
 		glm::mat4 model = glm::mat4(1.0f);
 		shaderGeometryPass.use();
 		shaderGeometryPass.setMat4("projection", projection);
+
 		shaderGeometryPass.setMat4("view", view);
 		glm::mat4 VP = projection * view;
 		for (unsigned int i = 0; i < objectPositions.size(); i++)
@@ -242,6 +245,7 @@ int main()
 
 		SceneViewFBO->bindBuffer();
 
+
 		glViewport(0, 0, EditorUI->GetSceneViewSize().x, EditorUI->GetSceneViewSize().y);
 
 		// 2. lighting pass: calculate lighting by iterating over a screen filled quad pixel-by-pixel using the gbuffer's content.
@@ -254,9 +258,6 @@ int main()
 		glBindTexture(GL_TEXTURE_2D, GBuffer->normalTexture_1_ID);
 		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, GBuffer->colourTexture_0_ID);
-		glActiveTexture(GL_TEXTURE3);
-		glBindTexture(GL_TEXTURE_2D, GBuffer->depthTexture_ID);
-		;
 		// send light relevant uniforms
 		for (unsigned int i = 0; i < lightPositions.size(); i++)
 		{
@@ -274,26 +275,39 @@ int main()
 		renderQuad();
 
         MotionBlurFBO->bindBuffer();
+		glViewport(0, 0, EditorUI->GetSceneViewSize().x, EditorUI->GetSceneViewSize().y);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		//Motion Blur Pass
         motionBlurPass.use();
-        glActiveTexture(GL_TEXTURE0);
+
+		glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, SceneViewFBO->colourTexture_0_ID);
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, GBuffer->depthTexture_ID);
+
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, GBuffer->depthTexture_ID);
+
+
+
+
+        //glActiveTexture(GL_TEXTURE3);
+        //glBindTexture(GL_TEXTURE_2D, GBuffer->colourTexture_0_ID);
         motionBlurPass.setMat4("VP", VP);
         motionBlurPass.setMat4("PreviousVP", OldVP);
 
+		
         renderQuad();
-
+		
 		OldVP = VP;
 
 
-		SceneViewFBO->unbindBuffer();
+		MotionBlurFBO->unbindBuffer();
 
 		
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+
 
         //UI->Render
         EditorUI->RenderUI();
