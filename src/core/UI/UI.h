@@ -49,6 +49,8 @@ private:
 	void ToggleFullscreen();
 	void ToggleSettingsWindow();
 
+	void HelpMarker(const char* desc);
+
 	sPostProcessingSettings PostProcessingSettings;
 
 public:

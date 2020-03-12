@@ -40,7 +40,7 @@ void UI::DrawUI()
     main_window_flags |= ImGuiWindowFlags_MenuBar;
     main_window_flags |= ImGuiWindowFlags_NoResize;
     main_window_flags |= ImGuiWindowFlags_NoScrollbar;
-    //main_window_flags |= ImGuiWindowFlags_NoTitleBar;
+    main_window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus;
 
     ImGui::SetNextWindowSize(WindowSize);
     ImGui::SetNextWindowPosCenter();
@@ -64,6 +64,7 @@ void UI::DrawUI()
     //Log and stuff
     ImGui::BeginChild("LowerTabs", ImVec2(WindowSize.x, WindowSize.y /4), true);
 
+	//TABS**************************************************
     ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
     ImGui::BeginTabBar("MyTabBar", tab_bar_flags);
         if (ImGui::BeginTabItem("Content Viewer"))
@@ -290,9 +291,31 @@ void UI::DrawInspector()
     ImGui::PopStyleVar();
 }
 
+void UI::HelpMarker(const char* desc)
+{
+	ImGui::TextDisabled("(?)");
+	if (ImGui::IsItemHovered())
+	{
+		ImGui::BeginTooltip();
+		ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+		ImGui::TextUnformatted(desc);
+		ImGui::PopTextWrapPos();
+		ImGui::EndTooltip();
+	}
+}
+
 void UI::DrawSettings()
 {
-	ImGui::SetNextWindowSize(ImVec2(WindowSize.x/6, WindowSize.y/6));
-	ImGui::Begin("Settings");
+	//ImGui::SetNextWindowSize(ImVec2(WindowSize.x/6, WindowSize.y/6));
+	ImGuiWindowFlags window_flags = 0;
+	window_flags |= ImGuiWindowFlags_AlwaysAutoResize;
+	
+	ImGui::Begin("Settings", 0, window_flags);
+	ImGui::SliderInt("BlurCycles", &this->PostProcessingSettings.BlurCycles, 1, 50);
+	ImGui::SameLine();
+	HelpMarker("CTRL+click to input value.");
+	ImGui::SliderFloat("PixelVelocityMult", &this->PostProcessingSettings.PixelVelocityMult, 0.01, 1.0);
+	ImGui::SameLine();
+	HelpMarker("CTRL+click to input value.");
 	ImGui::End();
 }
