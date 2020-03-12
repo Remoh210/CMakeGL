@@ -51,7 +51,7 @@ cFBO* SceneViewFBO = nullptr;
 unsigned int quadVAO = 0;
 unsigned int quadVBO;
 
-glm::mat4 OldMVP(1.f); //For MotionBlur
+glm::mat4 OldVP(1.f); //For MotionBlur
 
 void renderQuad()
 {
@@ -179,6 +179,7 @@ int main()
 	shaderLightingPass.setInt("gPosition", 0);
 	shaderLightingPass.setInt("gNormal", 1);
 	shaderLightingPass.setInt("gAlbedoSpec", 2);
+	shaderLightingPass.setInt("gDepth", 3);
 
     
     EditorUI = new UI(ImVec2(SCR_WIDTH, SCR_HEIGHT), ImVec2(SceneViewWidth, SceneViewHeight), SceneViewFBO, window, ResizeFBOs);
@@ -217,20 +218,21 @@ int main()
 		shaderGeometryPass.use();
 		shaderGeometryPass.setMat4("projection", projection);
 		shaderGeometryPass.setMat4("view", view);
+		glm::mat4 VP = projection * view;
 		for (unsigned int i = 0; i < objectPositions.size(); i++)
 		{
 			model = glm::mat4(1.0f);
 			model = glm::translate(model, objectPositions[i]);
 			model = glm::scale(model, glm::vec3(0.25f));
 
-			glm::mat4 MVP = projection * view * model;
+			glm::mat4 MVP = VP * model;
 			shaderGeometryPass.setMat4("MVP", MVP);
 			//shaderGeometryPass.setMat4("OldMVP", OldMVP);
 			shaderGeometryPass.setMat4("model", model);
 			nanosuit.Draw(shaderGeometryPass);
-
-			//OldMVP = MVP;
+			
 		}
+		
 
 		SceneViewFBO->bindBuffer();
 
@@ -246,7 +248,11 @@ int main()
 		glBindTexture(GL_TEXTURE_2D, GBuffer->normalTexture_1_ID);
 		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, GBuffer->colourTexture_0_ID);
+		glActiveTexture(GL_TEXTURE3);
+		glBindTexture(GL_TEXTURE_2D, GBuffer->depthTexture_ID);
 
+		shaderLightingPass.setMat4("VP", VP);
+		shaderLightingPass.setMat4("PreviousVP", OldVP);
 		// send light relevant uniforms
 		for (unsigned int i = 0; i < lightPositions.size(); i++)
 		{
@@ -262,6 +268,7 @@ int main()
 		shaderLightingPass.setVec3("viewPos", camera.Position);
 		// finally render quad
 		renderQuad();
+		OldVP = VP;
 
 
 		SceneViewFBO->unbindBuffer();
