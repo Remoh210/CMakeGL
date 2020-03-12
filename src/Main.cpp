@@ -47,6 +47,7 @@ UI* EditorUI = nullptr;
 //FBO
 cFBO* GBuffer = nullptr;
 cFBO* SceneViewFBO = nullptr;
+cFBO* MotionBlurFBO = nullptr;
 //Put in a seopareta Class
 unsigned int quadVAO = 0;
 unsigned int quadVBO;
@@ -130,6 +131,7 @@ int main()
 	Shader shaderGeometryPass("8.1.g_buffer.vs", "8.1.g_buffer.fs");
 	Shader shaderLightingPass("8.1.deferred_shading.vs", "8.1.deferred_shading.fs");
 	Shader shaderLightBox("8.1.deferred_light_box.vs", "8.1.deferred_light_box.fs");
+	Shader motionBlurPass("motion_blur.vs","motion_blur.fs");
 
     // load models
     // -----------
@@ -153,6 +155,9 @@ int main()
 
 	SceneViewFBO = new cFBO();
 	SceneViewFBO->init(SceneViewWidth, SceneViewHeight, FboErr);
+
+    MotionBlurFBO = new cFBO();
+    MotionBlurFBO->init(SceneViewWidth, SceneViewHeight, FboErr);
 
 	// lighting info
 	// -------------
@@ -179,10 +184,12 @@ int main()
 	shaderLightingPass.setInt("gPosition", 0);
 	shaderLightingPass.setInt("gNormal", 1);
 	shaderLightingPass.setInt("gAlbedoSpec", 2);
-	shaderLightingPass.setInt("gDepth", 3);
+
+    motionBlurPass.setInt("gScreenTex", 0);
+	motionBlurPass.setInt("gDepth", 1);
 
     
-    EditorUI = new UI(ImVec2(SCR_WIDTH, SCR_HEIGHT), ImVec2(SceneViewWidth, SceneViewHeight), SceneViewFBO, window, ResizeFBOs);
+    EditorUI = new UI(ImVec2(SCR_WIDTH, SCR_HEIGHT), ImVec2(SceneViewWidth, SceneViewHeight), MotionBlurFBO, window, ResizeFBOs);
 
 
     // render loop
@@ -230,7 +237,6 @@ int main()
 			//shaderGeometryPass.setMat4("OldMVP", OldMVP);
 			shaderGeometryPass.setMat4("model", model);
 			nanosuit.Draw(shaderGeometryPass);
-			
 		}
 		
 
@@ -250,9 +256,7 @@ int main()
 		glBindTexture(GL_TEXTURE_2D, GBuffer->colourTexture_0_ID);
 		glActiveTexture(GL_TEXTURE3);
 		glBindTexture(GL_TEXTURE_2D, GBuffer->depthTexture_ID);
-
-		shaderLightingPass.setMat4("VP", VP);
-		shaderLightingPass.setMat4("PreviousVP", OldVP);
+		;
 		// send light relevant uniforms
 		for (unsigned int i = 0; i < lightPositions.size(); i++)
 		{
@@ -268,6 +272,20 @@ int main()
 		shaderLightingPass.setVec3("viewPos", camera.Position);
 		// finally render quad
 		renderQuad();
+
+        MotionBlurFBO->bindBuffer();
+
+		//Motion Blur Pass
+        motionBlurPass.use();
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, SceneViewFBO->colourTexture_0_ID);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, GBuffer->depthTexture_ID);
+        motionBlurPass.setMat4("VP", VP);
+        motionBlurPass.setMat4("PreviousVP", OldVP);
+
+        renderQuad();
+
 		OldVP = VP;
 
 
@@ -276,7 +294,6 @@ int main()
 		
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 
         //UI->Render
         EditorUI->RenderUI();
