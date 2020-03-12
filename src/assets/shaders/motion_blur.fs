@@ -37,14 +37,11 @@ void main()
 	//NewTexCoor += velocity;
 	for(int i = 1; i < BlurCycleCount; ++i, NewTexCoor += velocity)
 	{
-    // Sample the color buffer along the velocity vector.
-    vec4 currentColor = texture(gRenderedTex, NewTexCoor);
-    // Add the current color to our color sum.
-    color += currentColor;
+		// Sample the color buffer along the velocity vector.
+		vec4 currentColor = texture(gRenderedTex, NewTexCoor);
+		// Add the current color to our color sum.
+		color += currentColor;
 	}
 	//Average all of the samples to get the final blur color.
 	FinalFragColor = color / BlurCycleCount;
-
-
-
 }
