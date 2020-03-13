@@ -15,6 +15,7 @@
 #include <iostream>
 
 #include "core/fbo/cFBO.h"
+#include "core/SkyBox/cSkyBox.h"
 
 void window_size_callback(GLFWwindow* window, int width, int height);
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -193,6 +194,17 @@ int main()
     EditorUI = new UI(ImVec2(SCR_WIDTH, SCR_HEIGHT), ImVec2(SceneViewWidth, SceneViewHeight), MotionBlurFBO, window, ResizeFBOs);
 
 
+	std::vector<std::string> VecSkyboxTex
+	{
+		FileSystem::getPath("resources/textures/skybox/right.jpg"),
+		FileSystem::getPath("resources/textures/skybox/left.jpg"),
+		FileSystem::getPath("resources/textures/skybox/top.jpg"),
+		FileSystem::getPath("resources/textures/skybox/bottom.jpg"),
+		FileSystem::getPath("resources/textures/skybox/front.jpg"),
+		FileSystem::getPath("resources/textures/skybox/back.jpg")
+	};
+
+	cSkyBox SkyBox(VecSkyboxTex, "sky_box.vs", "sky_box.fs", &camera);
 
     // render loop
     // -----------
@@ -221,7 +233,7 @@ int main()
 		GBuffer->bindBuffer();
 		glViewport(0, 0, EditorUI->GetSceneViewSize().x, EditorUI->GetSceneViewSize().y);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)EditorUI->GetSceneViewSize().x / (float)EditorUI->GetSceneViewSize().y, 0.1f, 100.0f);
+		glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)EditorUI->GetSceneViewSize().x / (float)EditorUI->GetSceneViewSize().y, 0.001f, 100.0f);
 		glm::mat4 view = camera.GetViewMatrix();
 		glm::mat4 model = glm::mat4(1.0f);
 		shaderGeometryPass.use();
@@ -242,6 +254,8 @@ int main()
 			nanosuit.Draw(shaderGeometryPass);
 		}
 		
+
+
 		SceneViewFBO->bindBuffer();
 
 
@@ -270,8 +284,11 @@ int main()
 			shaderLightingPass.setFloat("lights[" + std::to_string(i) + "].Quadratic", quadratic);
 		}
 		shaderLightingPass.setVec3("viewPos", camera.Position);
+
+		
 		// finally render quad
 		renderQuad();
+		
 
         MotionBlurFBO->bindBuffer();
 		glViewport(0, 0, EditorUI->GetSceneViewSize().x, EditorUI->GetSceneViewSize().y);
@@ -279,6 +296,8 @@ int main()
 
 		//Motion Blur Pass
         motionBlurPass.use();
+
+		
 
 		glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, SceneViewFBO->colourTexture_0_ID);
@@ -292,10 +311,13 @@ int main()
 		motionBlurPass.setInt("BlurCycleCount", EditorUI->GetPostProcessingSettings().BlurCycles);
 		motionBlurPass.setFloat("VelocityMult", EditorUI->GetPostProcessingSettings().PixelVelocityMult);
 
+		SkyBox.Draw(view, projection, GBuffer->depthTexture_ID);
         renderQuad();
 		
+
 		OldVP = VP;
 
+		
 		MotionBlurFBO->unbindBuffer();
 
 		
