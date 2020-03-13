@@ -126,15 +126,9 @@ void UI::DrawSceneEditor()
 	// Menu Bar
 	if (ImGui::BeginMenuBar())
 	{
-		if (ImGui::BeginMenu("File"))
-		{
-			ImGui::MenuItem("Save");
-			ImGui::MenuItem("Load");
-			ImGui::EndMenu();
-		}
 		if (ImGui::BeginMenu("View"))
 		{
-			if (ImGui::MenuItem("Full Screen", "Ctrl + F"))
+			if (ImGui::MenuItem("Full Screen"))
 			{
 				ToggleFullscreen();
 			}

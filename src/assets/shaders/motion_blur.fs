@@ -9,6 +9,7 @@ uniform sampler2D gDepthTex;
 uniform mat4 VP;
 uniform mat4 PreviousVP;
 uniform int BlurCycleCount;
+uniform float VelocityMult;
 
 void main()
 {
@@ -29,7 +30,7 @@ void main()
 	previousPos /= previousPos.w;
 	// Use this frame's position and last frame's to compute the pixel velocity.
 	vec2 velDif = currentPos.xy - previousPos.xy;
-	vec2 velocity = velDif / 10.f;
+	vec2 velocity = velDif * VelocityMult;
 	
 	// Get the initial color at this pixel.
 	vec2 NewTexCoor = TexCoords;
