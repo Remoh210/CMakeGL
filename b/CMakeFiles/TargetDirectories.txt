@@ -1,5 +1,0 @@
-C:/Users/l2myf/Desktop/CMakeGL/b/CMakeFiles/STB_IMAGE.dir
-C:/Users/l2myf/Desktop/CMakeGL/b/CMakeFiles/CMakeGL.dir
-C:/Users/l2myf/Desktop/CMakeGL/b/CMakeFiles/GLAD.dir
-C:/Users/l2myf/Desktop/CMakeGL/b/CMakeFiles/ALL_BUILD.dir
-C:/Users/l2myf/Desktop/CMakeGL/b/CMakeFiles/ZERO_CHECK.dir
