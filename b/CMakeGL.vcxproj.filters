@@ -1,0 +1,152 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\l2myf\Desktop\CMakeGL\src\Main.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\l2myf\Desktop\CMakeGL\src\core\SkyBox\cSkyBox.cpp">
+      <Filter>Sources\core\SkyBox</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\l2myf\Desktop\CMakeGL\src\core\UI\UI.cpp">
+      <Filter>Sources\core\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\l2myf\Desktop\CMakeGL\src\core\fbo\cFbo.cpp">
+      <Filter>Sources\core\fbo</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\l2myf\Desktop\CMakeGL\src\thirdParty\glad.c">
+      <Filter>Sources\thirdParty</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\l2myf\Desktop\CMakeGL\src\thirdParty\imgui\imgui.cpp">
+      <Filter>Sources\thirdParty\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\l2myf\Desktop\CMakeGL\src\thirdParty\imgui\imgui_demo.cpp">
+      <Filter>Sources\thirdParty\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\l2myf\Desktop\CMakeGL\src\thirdParty\imgui\imgui_draw.cpp">
+      <Filter>Sources\thirdParty\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\l2myf\Desktop\CMakeGL\src\thirdParty\imgui\imgui_impl_glfw.cpp">
+      <Filter>Sources\thirdParty\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\l2myf\Desktop\CMakeGL\src\thirdParty\imgui\imgui_impl_opengl3.cpp">
+      <Filter>Sources\thirdParty\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\l2myf\Desktop\CMakeGL\src\thirdParty\imgui\imgui_widgets.cpp">
+      <Filter>Sources\thirdParty\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\l2myf\Desktop\CMakeGL\src\thirdParty\stb_image.cpp">
+      <Filter>Sources\thirdParty</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\l2myf\Desktop\CMakeGL\src\common\common.h">
+      <Filter>Sources\common</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\l2myf\Desktop\CMakeGL\src\core\SkyBox\cSkyBox.h">
+      <Filter>Sources\core\SkyBox</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\l2myf\Desktop\CMakeGL\src\core\UI\UI.h">
+      <Filter>Sources\core\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\l2myf\Desktop\CMakeGL\src\core\fbo\cFBO.h">
+      <Filter>Sources\core\fbo</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\l2myf\Desktop\CMakeGL\src\thirdParty\imgui\imconfig.h">
+      <Filter>Sources\thirdParty\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\l2myf\Desktop\CMakeGL\src\thirdParty\imgui\imgui.h">
+      <Filter>Sources\thirdParty\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\l2myf\Desktop\CMakeGL\src\thirdParty\imgui\imgui_impl_glfw.h">
+      <Filter>Sources\thirdParty\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\l2myf\Desktop\CMakeGL\src\thirdParty\imgui\imgui_impl_opengl3.h">
+      <Filter>Sources\thirdParty\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\l2myf\Desktop\CMakeGL\src\thirdParty\imgui\imgui_internal.h">
+      <Filter>Sources\thirdParty\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\l2myf\Desktop\CMakeGL\src\thirdParty\imgui\imstb_rectpack.h">
+      <Filter>Sources\thirdParty\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\l2myf\Desktop\CMakeGL\src\thirdParty\imgui\imstb_textedit.h">
+      <Filter>Sources\thirdParty\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\l2myf\Desktop\CMakeGL\src\thirdParty\imgui\imstb_truetype.h">
+      <Filter>Sources\thirdParty\imgui</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\l2myf\Desktop\CMakeGL\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="C:\Users\l2myf\Desktop\CMakeGL\src\assets\shaders\8.1.deferred_light_box.fs">
+      <Filter>Sources\assets\shaders</Filter>
+    </None>
+    <None Include="C:\Users\l2myf\Desktop\CMakeGL\src\assets\shaders\8.1.deferred_light_box.vs">
+      <Filter>Sources\assets\shaders</Filter>
+    </None>
+    <None Include="C:\Users\l2myf\Desktop\CMakeGL\src\assets\shaders\8.1.deferred_shading.fs">
+      <Filter>Sources\assets\shaders</Filter>
+    </None>
+    <None Include="C:\Users\l2myf\Desktop\CMakeGL\src\assets\shaders\8.1.deferred_shading.vs">
+      <Filter>Sources\assets\shaders</Filter>
+    </None>
+    <None Include="C:\Users\l2myf\Desktop\CMakeGL\src\assets\shaders\8.1.fbo_debug.fs">
+      <Filter>Sources\assets\shaders</Filter>
+    </None>
+    <None Include="C:\Users\l2myf\Desktop\CMakeGL\src\assets\shaders\8.1.fbo_debug.vs">
+      <Filter>Sources\assets\shaders</Filter>
+    </None>
+    <None Include="C:\Users\l2myf\Desktop\CMakeGL\src\assets\shaders\8.1.g_buffer.fs">
+      <Filter>Sources\assets\shaders</Filter>
+    </None>
+    <None Include="C:\Users\l2myf\Desktop\CMakeGL\src\assets\shaders\8.1.g_buffer.vs">
+      <Filter>Sources\assets\shaders</Filter>
+    </None>
+    <None Include="C:\Users\l2myf\Desktop\CMakeGL\src\assets\shaders\motion_blur.fs">
+      <Filter>Sources\assets\shaders</Filter>
+    </None>
+    <None Include="C:\Users\l2myf\Desktop\CMakeGL\src\assets\shaders\motion_blur.vs">
+      <Filter>Sources\assets\shaders</Filter>
+    </None>
+    <None Include="C:\Users\l2myf\Desktop\CMakeGL\src\assets\shaders\sky_box.fs">
+      <Filter>Sources\assets\shaders</Filter>
+    </None>
+    <None Include="C:\Users\l2myf\Desktop\CMakeGL\src\assets\shaders\sky_box.vs">
+      <Filter>Sources\assets\shaders</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Sources">
+      <UniqueIdentifier>{CA1DD4B9-3D22-33CF-A7A4-3652263FD7F9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\assets">
+      <UniqueIdentifier>{DE23C71F-F2CF-3AC4-A006-4811B72196CB}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\assets\shaders">
+      <UniqueIdentifier>{B38CD9E3-0EDE-3522-BED2-5E63E9A8AD9C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\common">
+      <UniqueIdentifier>{B81EDBA7-2C58-3348-A799-1FD3B84A0FE5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\core">
+      <UniqueIdentifier>{ED93B2C8-FA70-31B7-B3A4-A03A8B497561}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\core\SkyBox">
+      <UniqueIdentifier>{CDCA9666-53BC-39B6-BE16-E26F378BD482}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\core\UI">
+      <UniqueIdentifier>{F3D68319-1C94-3915-BB60-DE040B53CE90}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\core\fbo">
+      <UniqueIdentifier>{45D902A2-AC0B-306F-B11A-65B04E487104}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\thirdParty">
+      <UniqueIdentifier>{15138297-B1BB-3155-A247-B4B9BFFA8263}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\thirdParty\imgui">
+      <UniqueIdentifier>{5E41FC18-A763-3E99-9A98-2CD52C1B0DC8}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

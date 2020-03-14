@@ -1,11 +1,14 @@
-#version 450
-out vec3 vsViewDirection;
+#version 330 core
+layout (location = 0) in vec3 aPos;
 
-uniform mat4 invView;
-uniform mat4 invProj;
+out vec3 TexCoords;
+
+uniform mat4 projection;
+uniform mat4 view;
 
 void main()
 {
-    gl_Position = vec4(((gl_VertexID & 1) << 2) - 1, (gl_VertexID & 2) * 2 - 1, 0.0, 1.0);
-    vsViewDirection = mat3(invView) * (invProj * gl_Position).xyz;
-}
+    TexCoords = aPos;
+    vec4 pos = projection * view * vec4(aPos, 1.0);
+    gl_Position = pos.xyww;
+}  

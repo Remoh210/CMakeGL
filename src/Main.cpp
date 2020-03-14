@@ -185,6 +185,7 @@ int main()
 	shaderLightingPass.setInt("gPosition", 0);
 	shaderLightingPass.setInt("gNormal", 1);
 	shaderLightingPass.setInt("gAlbedoSpec", 2);
+	shaderLightingPass.setInt("gDTex", 3);
 
 	motionBlurPass.use();
     motionBlurPass.setInt("gRenderedTex", 0);
@@ -233,7 +234,7 @@ int main()
 		GBuffer->bindBuffer();
 		glViewport(0, 0, EditorUI->GetSceneViewSize().x, EditorUI->GetSceneViewSize().y);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)EditorUI->GetSceneViewSize().x / (float)EditorUI->GetSceneViewSize().y, 0.001f, 100.0f);
+		glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)EditorUI->GetSceneViewSize().x / (float)EditorUI->GetSceneViewSize().y, 0.1f, 100.0f);
 		glm::mat4 view = camera.GetViewMatrix();
 		glm::mat4 model = glm::mat4(1.0f);
 		shaderGeometryPass.use();
@@ -254,7 +255,7 @@ int main()
 			nanosuit.Draw(shaderGeometryPass);
 		}
 		
-
+		SkyBox.Draw(view, projection, GBuffer->depthTexture_ID);
 
 		SceneViewFBO->bindBuffer();
 
@@ -271,6 +272,10 @@ int main()
 		glBindTexture(GL_TEXTURE_2D, GBuffer->normalTexture_1_ID);
 		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, GBuffer->colourTexture_0_ID);
+		glActiveTexture(GL_TEXTURE3);
+		glBindTexture(GL_TEXTURE_2D, GBuffer->depthTexture_ID);
+
+
 		// send light relevant uniforms
 		for (unsigned int i = 0; i < lightPositions.size(); i++)
 		{
@@ -286,6 +291,7 @@ int main()
 		shaderLightingPass.setVec3("viewPos", camera.Position);
 
 		
+
 		// finally render quad
 		renderQuad();
 		
@@ -311,12 +317,12 @@ int main()
 		motionBlurPass.setInt("BlurCycleCount", EditorUI->GetPostProcessingSettings().BlurCycles);
 		motionBlurPass.setFloat("VelocityMult", EditorUI->GetPostProcessingSettings().PixelVelocityMult);
 
-		SkyBox.Draw(view, projection, GBuffer->depthTexture_ID);
+
+		
         renderQuad();
 		
 
 		OldVP = VP;
-
 		
 		MotionBlurFBO->unbindBuffer();
 

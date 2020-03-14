@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\l2myf\Desktop\CMakeGL\src\thirdParty\glad.c">
+      <Filter>Sources\thirdParty</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\l2myf\Desktop\CMakeGL\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Sources">
+      <UniqueIdentifier>{CA1DD4B9-3D22-33CF-A7A4-3652263FD7F9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\thirdParty">
+      <UniqueIdentifier>{15138297-B1BB-3155-A247-B4B9BFFA8263}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

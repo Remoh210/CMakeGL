@@ -6,6 +6,7 @@ in vec2 TexCoords;
 uniform sampler2D gPosition;
 uniform sampler2D gNormal;
 uniform sampler2D gAlbedoSpec;
+uniform sampler2D gDTex;
 
 uniform mat4 VP;
 uniform mat4 PreviousVP;
@@ -23,14 +24,23 @@ uniform vec3 viewPos;
 
 void main()
 {             
-    // retrieve data from gbuffer
+
     vec3 FragPos = texture(gPosition, TexCoords).rgb;
     vec3 Normal = texture(gNormal, TexCoords).rgb;
     vec3 Diffuse = texture(gAlbedoSpec, TexCoords).rgb;
     float Specular = texture(gAlbedoSpec, TexCoords).a;
+
+	//HACK HACK HACK, USE Specular to set "not light" (for skybox)
+	float alpha = texture(gAlbedoSpec, TexCoords).a;
+	if(alpha == 0)
+	{
+	 vec3 Diffuse = texture(gAlbedoSpec, TexCoords).rgb;
+	 FragColor = vec4(Diffuse, 1.0);
+	 return;
+	}
     
     // then calculate lighting as usual
-    vec3 lighting  = Diffuse * 0.1; // hard-coded ambient component
+    vec3 lighting  = Diffuse * 0.3; // hard-coded ambient component
     vec3 viewDir  = normalize(viewPos - FragPos);
     for(int i = 0; i < NR_LIGHTS; ++i)
     {
@@ -48,6 +58,9 @@ void main()
         specular *= attenuation;
         lighting += diffuse + specular;        
     }
+	
+	//vec3 dp = texture(gDTex, TexCoords).rgb;
+	//FragColor = vec4(dp, 1.0);
     FragColor = vec4(lighting, 1.0);
 
 }

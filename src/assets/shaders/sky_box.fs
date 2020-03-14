@@ -1,12 +1,14 @@
-#version 450
+#version 330 core
 
-in vec3 vsViewDirection;
+out vec4 FragColor;
+layout (location = 2) out vec4 gAlbedoSpec;
 
-out vec4 fragment_color;
+in vec3 TexCoords;
 
 uniform samplerCube skybox;
 
 void main()
-{
-    fragment_color = texture(skybox, vsViewDirection);
+{    
+    gAlbedoSpec.rgb = texture(skybox, TexCoords).rgb;
+	gAlbedoSpec.a = 0;
 }

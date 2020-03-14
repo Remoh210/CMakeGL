@@ -18,8 +18,8 @@ public:
 	GLuint colourTexture_0_ID;		
 	GLuint normalTexture_1_ID;
 	GLuint vertexWorldPos_2_ID;
-
 	GLuint depthTexture_ID;		
+
 	GLint width;		
 	GLint height;
 
