@@ -104,6 +104,7 @@ cSkyBox::~cSkyBox()
 
 void cSkyBox::Draw(glm::mat4 view, glm::mat4 projection, GLuint& depthTex)
 {
+	glDepthMask(GL_FALSE);//disable writing to the depth buffer
 	glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
 	//glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
 	SkyBoxShader->use();
@@ -117,6 +118,6 @@ void cSkyBox::Draw(glm::mat4 view, glm::mat4 projection, GLuint& depthTex)
 
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 	glBindVertexArray(0);
-	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS); // set depth function back to default
+	glDepthMask(GL_TRUE);
 }

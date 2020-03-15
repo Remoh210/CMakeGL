@@ -30,9 +30,9 @@ void main()
     vec3 Diffuse = texture(gAlbedoSpec, TexCoords).rgb;
     float Specular = texture(gAlbedoSpec, TexCoords).a;
 
-	//HACK HACK HACK, USE Specular to set "not light" (for skybox)
-	float alpha = texture(gAlbedoSpec, TexCoords).a;
-	if(alpha == 0)
+	float dpth = texture(gDTex, TexCoords).r;
+	//HACK USE Specular to set "not light" (for skybox)
+	if(dpth == 1)
 	{
 	 vec3 Diffuse = texture(gAlbedoSpec, TexCoords).rgb;
 	 FragColor = vec4(Diffuse, 1.0);

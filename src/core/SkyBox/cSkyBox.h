@@ -14,8 +14,9 @@ public:
 	cSkyBox(std::vector<std::string> &Textures, const char* skyBoxVS, const char* skyBoxFS, Camera* camera);
 	~cSkyBox();
 
-	//!! draw skybox as last!!
+	//!! draw skybox last!!
 	void Draw(glm::mat4 view, glm::mat4 projection, GLuint& depthTex);
+
 
 	inline unsigned int GetTextureID() { return TextureID; }
 	inline Shader* GetShader() { return SkyBoxShader; }

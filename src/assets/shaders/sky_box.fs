@@ -10,5 +10,6 @@ uniform samplerCube skybox;
 void main()
 {    
     gAlbedoSpec.rgb = texture(skybox, TexCoords).rgb;
+	//Ignore lighting
 	gAlbedoSpec.a = 0;
 }

@@ -257,6 +257,7 @@ int main()
 		
 		SkyBox.Draw(view, projection, GBuffer->depthTexture_ID);
 
+
 		SceneViewFBO->bindBuffer();
 
 
@@ -274,6 +275,7 @@ int main()
 		glBindTexture(GL_TEXTURE_2D, GBuffer->colourTexture_0_ID);
 		glActiveTexture(GL_TEXTURE3);
 		glBindTexture(GL_TEXTURE_2D, GBuffer->depthTexture_ID);
+
 
 
 		// send light relevant uniforms
