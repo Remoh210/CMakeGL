@@ -99,23 +99,20 @@ cSkyBox::cSkyBox(std::vector<std::string> &Textures, const char* skyBoxVS, const
 
 cSkyBox::~cSkyBox()
 {
-	//RemoveTextures
+	glDeleteTextures(1, &(this->TextureID));
 }
 
 void cSkyBox::Draw(glm::mat4 view, glm::mat4 projection, GLuint& depthTex)
 {
 	glDepthMask(GL_FALSE);//disable writing to the depth buffer
 	glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
-	//glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
 	SkyBoxShader->use();
 	glm::mat4 NewView = glm::mat4(glm::mat3(view)); // remove translation from the view matrix
 	SkyBoxShader->setMat4("view", NewView);
 	SkyBoxShader->setMat4("projection", projection);
-	// skybox cube
 	glBindVertexArray(SkyboxVAO);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, TextureID);
-
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 	glBindVertexArray(0);
 	glDepthFunc(GL_LESS); // set depth function back to default

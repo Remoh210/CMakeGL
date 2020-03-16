@@ -211,21 +211,17 @@ int main()
     // -----------
     while (!glfwWindowShouldClose(window))
     {
-
         // per-frame time logic
         // --------------------
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
-        // input
-        // -----
         processInput(window);
 
         EditorUI->DrawUI();
         
-		// render
-		// ------
+		//Geometry pass
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -255,16 +251,15 @@ int main()
 			nanosuit.Draw(shaderGeometryPass);
 		}
 		
+		//Draw Skybox
 		SkyBox.Draw(view, projection, GBuffer->depthTexture_ID);
 
-
+		// lighting pass
 		SceneViewFBO->bindBuffer();
-
 
 		glViewport(0, 0, EditorUI->GetSceneViewSize().x, EditorUI->GetSceneViewSize().y);
 
-		// 2. lighting pass: calculate lighting by iterating over a screen filled quad pixel-by-pixel using the gbuffer's content.
-		// -----------------------------------------------------------------------------------------------------------------------
+		
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		shaderLightingPass.use();
 		glActiveTexture(GL_TEXTURE0);
@@ -276,9 +271,6 @@ int main()
 		glActiveTexture(GL_TEXTURE3);
 		glBindTexture(GL_TEXTURE_2D, GBuffer->depthTexture_ID);
 
-
-
-		// send light relevant uniforms
 		for (unsigned int i = 0; i < lightPositions.size(); i++)
 		{
 			shaderLightingPass.setVec3("lights[" + std::to_string(i) + "].Position", lightPositions[i]);
@@ -292,11 +284,7 @@ int main()
 		}
 		shaderLightingPass.setVec3("viewPos", camera.Position);
 
-		
-
-		// finally render quad
 		renderQuad();
-		
 
         MotionBlurFBO->bindBuffer();
 		glViewport(0, 0, EditorUI->GetSceneViewSize().x, EditorUI->GetSceneViewSize().y);
@@ -305,34 +293,24 @@ int main()
 		//Motion Blur Pass
         motionBlurPass.use();
 
-		
-
 		glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, SceneViewFBO->colourTexture_0_ID);
-
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, GBuffer->depthTexture_ID);
 
-
         motionBlurPass.setMat4("VP", VP);
         motionBlurPass.setMat4("PreviousVP", OldVP);
+		OldVP = VP;
 		motionBlurPass.setInt("BlurCycleCount", EditorUI->GetPostProcessingSettings().BlurCycles);
 		motionBlurPass.setFloat("VelocityMult", EditorUI->GetPostProcessingSettings().PixelVelocityMult);
 
-
-		
         renderQuad();
-		
 
-		OldVP = VP;
 		
 		MotionBlurFBO->unbindBuffer();
 
-		
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-
 
         //UI->Render
         EditorUI->RenderUI();
