@@ -16,6 +16,7 @@ cMesh::cMesh(std::vector<sVertex> vertices, std::vector<unsigned int> indices, c
 {
 	this->mVertices = vertices;
 	this->mIndices = indices;
+	this->mMaterial = material;
 
 	// now that we have all the required data, set the vertex buffers and its attribute pointers.
 	setupMesh();

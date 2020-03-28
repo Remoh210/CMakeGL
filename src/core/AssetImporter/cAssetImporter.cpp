@@ -25,7 +25,7 @@ cAssetImporter::cAssetImporter()
 void cAssetImporter::LoadModel(std::string const & path)
 {
 	//Create static mesh 
-
+	
 	// read file via ASSIMP
 	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
@@ -40,19 +40,23 @@ void cAssetImporter::LoadModel(std::string const & path)
 
 	// process ASSIMP's root node recursively
 	processNode(scene->mRootNode, scene);
+
+	cStaticMesh* staticMesh = new cStaticMesh(vec_mesh_temp);
+	vec_mesh_temp.clear();
+
+	vec_static_mesh.push_back(staticMesh);
 }
 
 
 void cAssetImporter::processNode(aiNode *node, const aiScene *scene)
 {
-	std::vector<cMesh*> vec_mesh;
 	// process each mesh located at the current node
 	for (unsigned int i = 0; i < node->mNumMeshes; i++)
 	{
 		// the node object only contains indices to index the actual objects in the scene. 
 		// the scene contains all the data, node is just to keep stuff organized (like relations between nodes).
 		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-		vec_mesh.push_back(processMesh(mesh, scene));
+		vec_mesh_temp.push_back(processMesh(mesh, scene));
 	}
 	// after we've processed all of the meshes (if any) we then recursively process each of the children nodes
 	for (unsigned int i = 0; i < node->mNumChildren; i++)
@@ -137,8 +141,13 @@ cMesh* cAssetImporter::processMesh(aiMesh * mesh, const aiScene * scene)
 	std::vector<sTexture> heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
 	textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
 
-	Shader* default_shader = mMainShaders["default_shader"];
-	cMaterial* current_material = new cMaterial(default_shader, textures);
+	std::map<std::string, Shader*>::iterator it;
+	it = mMainShaders.find("default_shader");
+	if (it == mMainShaders.end())
+	{
+		std::cout << "Oh no, default_shader wasn't found";
+	}
+	cMaterial* current_material = new cMaterial(it->second, textures);
 
 	// return a mesh object created from the extracted mesh data
 	return new cMesh(vertices, indices, current_material);

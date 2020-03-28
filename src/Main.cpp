@@ -16,6 +16,9 @@
 
 #include "core/fbo/cFBO.h"
 #include "core/SkyBox/cSkyBox.h"
+#include "core/SkyBox/cSkyBox.h"
+
+#include "core/AssetImporter/cAssetImporter.h"
 
 void window_size_callback(GLFWwindow* window, int width, int height);
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -31,6 +34,9 @@ unsigned int SCR_HEIGHT = 600;
 float SceneViewScale = 0.65;
 int SceneViewHeight = SCR_HEIGHT * SceneViewScale;
 int SceneViewWidth = SCR_WIDTH * SceneViewScale;
+
+//AssetLoader
+cAssetImporter* AssetLoader = nullptr;
 
 // camera
 Camera camera(glm::vec3(0.0f, 0.0f, 8.0f));
@@ -136,7 +142,9 @@ int main()
 
     // load models
     // -----------
-	Model nanosuit(FileSystem::getPath("resources/objects/nanosuit/nanosuit.obj"));
+	AssetLoader = new cAssetImporter();
+	AssetLoader->LoadModel(FileSystem::getPath("resources/objects/nanosuit/nanosuit.obj"));
+	//Model nanosuit(FileSystem::getPath("resources/objects/nanosuit/nanosuit.obj"));
 
 	std::vector<glm::vec3> objectPositions;
 	objectPositions.push_back(glm::vec3(-3.0, -3.0, -3.0));
@@ -248,7 +256,8 @@ int main()
 			shaderGeometryPass.setMat4("MVP", MVP);
 			//shaderGeometryPass.setMat4("OldMVP", OldMVP);
 			shaderGeometryPass.setMat4("model", model);
-			nanosuit.Draw(shaderGeometryPass);
+			AssetLoader->vec_static_mesh[0]->Draw();
+			//nanosuit.Draw(shaderGeometryPass);
 		}
 		
 		//Draw Skybox

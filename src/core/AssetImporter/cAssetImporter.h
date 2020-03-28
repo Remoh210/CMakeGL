@@ -33,6 +33,8 @@ private:
 	std::vector<sTexture> mLoadedTextures;
 
 	//??
-	std::map<const char*, Shader*> mMainShaders;
+	std::map<std::string, Shader*> mMainShaders;
 
+	//
+	std::vector<cMesh*> vec_mesh_temp;
 };
