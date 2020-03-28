@@ -1,38 +1,25 @@
-//
-// Material class
-//
 #pragma once
 
 //common
 #include<string>
+#include<vector>
 //common
 
-#include <learnopengl/shader_m.h>
+#include <learnopengl/shader.h>
+#include "sTexture.h"
 
-struct Texture {
-    unsigned int id;
-    string type;
-    string path;
-};
-
+//
+// Material class
+//
 class cMaterial
 {
 public:
 
-    cMaterial(shader* inShader, vector<Texture> inTextures)
-        :Shade(inShader),
-        Textures(inTextures)
-    {
+    cMaterial(Shader* inShader, std::vector<sTexture> inTextures);
+	~cMaterial();
 
-    }
-
-
-    vector<Texture> Textures;
-
-
-    ~cMaterial();
-private:
-    shader* Shader;
+	Shader* MaterialShader;
+	std::vector<sTexture> Textures;
 };
 
 
