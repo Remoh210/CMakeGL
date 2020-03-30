@@ -12,6 +12,7 @@ public:
 
 	// draws the model, and thus all its meshes
 	void Draw();
+	inline std::vector<cMesh*> GetMeshses() { return mMeshes; };
 
 private:
 	std::vector<cMesh*> mMeshes;

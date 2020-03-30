@@ -70,7 +70,7 @@ cMesh* cAssetImporter::processMesh(aiMesh * mesh, const aiScene * scene)
 	// data to fill
 	std::vector<sVertex> vertices;
 	std::vector<unsigned int> indices;
-	std::vector<sTexture> textures;
+	std::vector<sTexture*> textures;
 
 	// Walk through each of the mesh's vertices
 	for (unsigned int i = 0; i < mesh->mNumVertices; i++)
@@ -129,16 +129,16 @@ cMesh* cAssetImporter::processMesh(aiMesh * mesh, const aiScene * scene)
 	// normal: texture_normalN
 
 	// 1. diffuse maps
-	std::vector<sTexture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
+	std::vector<sTexture*> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
 	textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
 	// 2. specular maps
-	std::vector<sTexture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
+	std::vector<sTexture*> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
 	textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 	// 3. normal maps
-	std::vector<sTexture> normalMaps = loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
+	std::vector<sTexture*> normalMaps = loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
 	textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
 	// 4. height maps
-	std::vector<sTexture> heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
+	std::vector<sTexture*> heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
 	textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
 
 	std::map<std::string, Shader*>::iterator it;
@@ -154,9 +154,9 @@ cMesh* cAssetImporter::processMesh(aiMesh * mesh, const aiScene * scene)
 }
 
 
-std::vector<sTexture> cAssetImporter::loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName)
+std::vector<sTexture*> cAssetImporter::loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName)
 {
-	std::vector<sTexture> textures;
+	std::vector<sTexture*> textures;
 	for (unsigned int i = 0; i < mat->GetTextureCount(type); i++)
 	{
 		aiString str;
@@ -165,7 +165,7 @@ std::vector<sTexture> cAssetImporter::loadMaterialTextures(aiMaterial *mat, aiTe
 		bool skip = false;
 		for (unsigned int j = 0; j < mLoadedTextures.size(); j++)
 		{
-			if (std::strcmp(mLoadedTextures[j].Path.data(), str.C_Str()) == 0)
+			if (std::strcmp(mLoadedTextures[j]->Path.data(), str.C_Str()) == 0)
 			{
 				textures.push_back(mLoadedTextures[j]);
 				skip = true; // a texture with the same filepath has already been loaded, continue to next one. (optimization)
@@ -174,10 +174,10 @@ std::vector<sTexture> cAssetImporter::loadMaterialTextures(aiMaterial *mat, aiTe
 		}
 		if (!skip)
 		{   // if texture hasn't been loaded already, load it
-			sTexture texture;
-			texture.Id = TextureFromFile(str.C_Str(), this->mDirectory);
-			texture.Type = typeName;
-			texture.Path = str.C_Str();
+			sTexture* texture = new sTexture();
+			texture->Id = TextureFromFile(str.C_Str(), this->mDirectory);
+			texture->Type = typeName;
+			texture->Path = str.C_Str();
 			textures.push_back(texture);
 			mLoadedTextures.push_back(texture);  // store it as texture loaded for entire model, to ensure we won't unneccesery load duplicate textures.
 		}

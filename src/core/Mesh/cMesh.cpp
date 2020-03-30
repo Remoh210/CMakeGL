@@ -34,7 +34,7 @@ void cMesh::Draw()
 		glActiveTexture(GL_TEXTURE0 + i); // active proper texture unit before binding
 		// retrieve texture number (the N in diffuse_textureN)
 		std::string number;
-		std::string name = mMaterial->Textures[i].Type;
+		std::string name = mMaterial->Textures[i]->Type;
 		if (name == "texture_diffuse")
 			number = std::to_string(diffuseNr++);
 		else if (name == "texture_specular")
@@ -45,10 +45,20 @@ void cMesh::Draw()
 			number = std::to_string(heightNr++); // transfer unsigned int to stream
 
 												 // now set the sampler to the correct texture unit
+		
+		//std::cout << number << std::endl;
 		glUniform1i(glGetUniformLocation(mMaterial->MaterialShader->ID, (name + number).c_str()), i);
 		// and finally bind the texture
-		glBindTexture(GL_TEXTURE_2D, mMaterial->Textures[i].Id);
+		glBindTexture(GL_TEXTURE_2D, mMaterial->Textures[i]->Id);
 	}
+
+
+	if (mMaterial->bUseDiffuseColour)
+	{
+		mMaterial->MaterialShader->setBool("bUseDiffuseColour", true);
+		mMaterial->MaterialShader->setVec4("DiffuseColour", mMaterial->DiffuseColour);
+	}
+
 
 	// draw mesh
 	glBindVertexArray(VAO);

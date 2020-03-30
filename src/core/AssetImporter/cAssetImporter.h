@@ -27,10 +27,10 @@ private:
 
 	void processNode(aiNode *node, const aiScene *scene);
 	cMesh* processMesh(aiMesh *mesh, const aiScene *scene);
-	std::vector<sTexture> loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName);
+	std::vector<sTexture*> loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName);
 
 	std::string mDirectory;
-	std::vector<sTexture> mLoadedTextures;
+	std::vector<sTexture*> mLoadedTextures;
 
 	//??
 	std::map<std::string, Shader*> mMainShaders;

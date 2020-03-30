@@ -1,7 +1,6 @@
 #include "UI.h"
 #include <iostream>
 
-
 UI::UI(ImVec2 window_size, ImVec2 scene_view_size, cFBO* scene_fbo, GLFWwindow* window, FBOResizeFunc resize_callback)
         :WindowSize(window_size),
 		SceneViewSize(scene_view_size),
@@ -22,10 +21,8 @@ UI::UI(ImVec2 window_size, ImVec2 scene_view_size, cFBO* scene_fbo, GLFWwindow* 
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 130");
     ImGui::StyleColorsDark();
-}
 
-UI::~UI()
-{
+	AssetImporter = nullptr;
 }
 
 void UI::DrawUI()
@@ -139,7 +136,7 @@ void UI::DrawSceneEditor()
 	}
 		
 
-    ImGui::Image((void*)SceneFBO->colourTexture_0_ID, SceneViewSize, ImVec2(0, 1), ImVec2(1, 0));
+    ImGui::Image((void*)SceneFBO->normalTexture_1_ID, SceneViewSize, ImVec2(0, 1), ImVec2(1, 0));
     ImGui::EndChild();
 
 
@@ -249,7 +246,6 @@ void UI::DrawSceneTree()
 
 void UI::DrawMainBar()
 {
-
     // Menu Bar
     if (ImGui::BeginMenuBar())
     {
@@ -281,6 +277,19 @@ void UI::DrawInspector()
 {
     ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.0f);
     ImGui::BeginChild("SceneTree", ImVec2(WindowSize.x / 6.5, WindowSize.y / 1.5), true/*, window_flags*/);
+	if (AssetImporter)
+	{
+		std::vector<cMesh*> vec_meshes = AssetImporter->vec_static_mesh[0]->GetMeshses();
+		for (cMesh* mesh : vec_meshes)
+		{
+			for (sTexture* tex : mesh->mMaterial->Textures)
+			{
+				ImGui::Text(tex->Type.c_str());
+				ImGui::Image((void*)tex->Id, ImVec2(150, 150));
+			}
+		}
+
+	}
     ImGui::EndChild();
     ImGui::PopStyleVar();
 }
@@ -312,4 +321,8 @@ void UI::DrawSettings()
 	ImGui::SameLine();
 	HelpMarker("CTRL+click to input value.");
 	ImGui::End();
+}
+
+UI::~UI()
+{
 }

@@ -18,6 +18,7 @@
 #include "core/SkyBox/cSkyBox.h"
 #include "core/SkyBox/cSkyBox.h"
 
+
 #include "core/AssetImporter/cAssetImporter.h"
 
 void window_size_callback(GLFWwindow* window, int width, int height);
@@ -143,10 +144,13 @@ int main()
     // load models
     // -----------
 	AssetLoader = new cAssetImporter();
+	
+	//AssetLoader->LoadModel(FileSystem::getPath("resources/objects/cyborg/cyborg.obj"));
 	AssetLoader->LoadModel(FileSystem::getPath("resources/objects/nanosuit/nanosuit.obj"));
-	//Model nanosuit(FileSystem::getPath("resources/objects/nanosuit/nanosuit.obj"));
+	//AssetLoader->LoadModel(FileSystem::getPath("resources/objects/cube/cube.fbx"));
 
 	std::vector<glm::vec3> objectPositions;
+
 	objectPositions.push_back(glm::vec3(-3.0, -3.0, -3.0));
 	objectPositions.push_back(glm::vec3(0.0, -3.0, -3.0));
 	objectPositions.push_back(glm::vec3(3.0, -3.0, -3.0));
@@ -199,9 +203,8 @@ int main()
     motionBlurPass.setInt("gRenderedTex", 0);
 	motionBlurPass.setInt("gDepthTex", 1);
 
-    
-    EditorUI = new UI(ImVec2(SCR_WIDTH, SCR_HEIGHT), ImVec2(SceneViewWidth, SceneViewHeight), MotionBlurFBO, window, ResizeFBOs);
-
+    EditorUI = new UI(ImVec2(SCR_WIDTH, SCR_HEIGHT), ImVec2(SceneViewWidth, SceneViewHeight), GBuffer, window, ResizeFBOs);
+	EditorUI->AssetImporter = AssetLoader;
 
 	std::vector<std::string> VecSkyboxTex
 	{
@@ -286,8 +289,8 @@ int main()
 			shaderLightingPass.setVec3("lights[" + std::to_string(i) + "].Color", lightColors[i]);
 			// update attenuation parameters and calculate radius
 			const float constant = 1.0; // note that we don't send this to the shader, we assume it is always 1.0 (in our case)
-			const float linear = 0.7;
-			const float quadratic = 1.8;
+			const float linear = 0.2;
+			const float quadratic = 1.2;
 			shaderLightingPass.setFloat("lights[" + std::to_string(i) + "].Linear", linear);
 			shaderLightingPass.setFloat("lights[" + std::to_string(i) + "].Quadratic", quadratic);
 		}

@@ -6,6 +6,7 @@
 #include "../../thirdParty/imgui/imgui.h"
 #include "../../thirdParty/imgui/imgui_impl_glfw.h"
 #include "../../thirdParty/imgui/imgui_impl_opengl3.h"
+#include "../AssetImporter/cAssetImporter.h"
 
 #include "../fbo/cFBO.h"
 
@@ -34,6 +35,8 @@ private:
 	void DrawSettings();
     //void Draw();
 
+
+
 	ImVec2 WindowSize;
 	ImVec2 SceneViewSize;
 	float SceneViewScale;
@@ -56,6 +59,10 @@ private:
 public:
     UI(ImVec2 window_size, ImVec2 scene_view_size, cFBO* scene_fbo, GLFWwindow* window, FBOResizeFunc resize_callback);
     ~UI();
+
+	//Test
+	cAssetImporter* AssetImporter;
+	//Test
 
     void DrawUI();
     void ResizeUI(int width, int height);

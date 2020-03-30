@@ -15,11 +15,15 @@ class cMaterial
 {
 public:
 
-    cMaterial(Shader* inShader, std::vector<sTexture> inTextures);
+    cMaterial(Shader* inShader, std::vector<sTexture*> inTextures);
 	~cMaterial();
 
 	Shader* MaterialShader;
-	std::vector<sTexture> Textures;
+	std::vector<sTexture*> Textures;
+
+	glm::vec4 DiffuseColour;
+
+	bool bUseDiffuseColour = false;
 };
 
 
