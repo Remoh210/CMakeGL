@@ -22,8 +22,14 @@ cMesh::cMesh(std::vector<sVertex> vertices, std::vector<unsigned int> indices, c
 	setupMesh();
 }
 
-void cMesh::Draw()
+void cMesh::Draw(glm::mat4 model, glm::mat4 view, glm::mat4 projection, glm::mat4 MVP)
 {
+	mMaterial->MaterialShader->use();
+	mMaterial->MaterialShader->setMat4("projection", projection);
+	mMaterial->MaterialShader->setMat4("view", view);
+	mMaterial->MaterialShader->setMat4("model", model);
+	mMaterial->MaterialShader->setMat4("MVP", MVP);
+
 	// bind appropriate textures
 	unsigned int diffuseNr = 1;
 	unsigned int specularNr = 1;
@@ -47,7 +53,8 @@ void cMesh::Draw()
 												 // now set the sampler to the correct texture unit
 		
 		//std::cout << number << std::endl;
-		glUniform1i(glGetUniformLocation(mMaterial->MaterialShader->ID, (name + number).c_str()), i);
+		mMaterial->MaterialShader->setInt((name + number).c_str(), i);
+		//glUniform1i(glGetUniformLocation(mMaterial->MaterialShader->ID, (name + number).c_str()), i);
 		// and finally bind the texture
 		glBindTexture(GL_TEXTURE_2D, mMaterial->Textures[i]->Id);
 	}
@@ -57,6 +64,10 @@ void cMesh::Draw()
 	{
 		mMaterial->MaterialShader->setBool("bUseDiffuseColour", true);
 		mMaterial->MaterialShader->setVec4("DiffuseColour", mMaterial->DiffuseColour);
+	}
+	else
+	{
+		mMaterial->MaterialShader->setBool("bUseDiffuseColour", false);
 	}
 
 

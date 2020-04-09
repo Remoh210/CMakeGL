@@ -204,6 +204,7 @@ int main()
 	motionBlurPass.setInt("gDepthTex", 1);
 
     EditorUI = new UI(ImVec2(SCR_WIDTH, SCR_HEIGHT), ImVec2(SceneViewWidth, SceneViewHeight), GBuffer, window, ResizeFBOs);
+
 	EditorUI->AssetImporter = AssetLoader;
 
 	std::vector<std::string> VecSkyboxTex
@@ -244,10 +245,10 @@ int main()
 		glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)EditorUI->GetSceneViewSize().x / (float)EditorUI->GetSceneViewSize().y, 0.1f, 100.0f);
 		glm::mat4 view = camera.GetViewMatrix();
 		glm::mat4 model = glm::mat4(1.0f);
-		shaderGeometryPass.use();
-		shaderGeometryPass.setMat4("projection", projection);
+		//shaderGeometryPass.use();
+		//shaderGeometryPass.setMat4("projection", projection);
 
-		shaderGeometryPass.setMat4("view", view);
+		//shaderGeometryPass.setMat4("view", view);
 		glm::mat4 VP = projection * view;
 		for (unsigned int i = 0; i < objectPositions.size(); i++)
 		{
@@ -256,10 +257,9 @@ int main()
 			model = glm::scale(model, glm::vec3(0.25f));
 
 			glm::mat4 MVP = VP * model;
-			shaderGeometryPass.setMat4("MVP", MVP);
-			//shaderGeometryPass.setMat4("OldMVP", OldMVP);
-			shaderGeometryPass.setMat4("model", model);
-			AssetLoader->vec_static_mesh[0]->Draw();
+			//shaderGeometryPass.setMat4("MVP", MVP);
+			//shaderGeometryPass.setMat4("model", model);
+			AssetLoader->vec_static_mesh[0]->Draw(model, view, projection, MVP);
 			//nanosuit.Draw(shaderGeometryPass);
 		}
 		

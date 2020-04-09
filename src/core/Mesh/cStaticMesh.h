@@ -11,7 +11,7 @@ public:
 	~cStaticMesh();
 
 	// draws the model, and thus all its meshes
-	void Draw();
+	void Draw(glm::mat4 model, glm::mat4 view, glm::mat4 projection, glm::mat4 MVP);
 	inline std::vector<cMesh*> GetMeshses() { return mMeshes; };
 
 private:

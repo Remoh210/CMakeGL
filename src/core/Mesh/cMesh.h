@@ -13,7 +13,7 @@ public:
 	~cMesh();
 
 	// render the mesh
-	void Draw();
+	void Draw(glm::mat4 model, glm::mat4 view, glm::mat4 projection, glm::mat4 MVP);
 
 	/*  Mesh Data  */
 	unsigned int VAO;

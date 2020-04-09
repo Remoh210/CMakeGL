@@ -8,6 +8,7 @@ in VS_OUT {
     vec3 FragPos;
     vec2 TexCoords;
 	vec3 Normal;
+	vec3 Tangent;
 	mat3 TBN;
 } fs_in;
 
@@ -17,6 +18,23 @@ uniform vec4 DiffuseColour;
 uniform sampler2D texture_diffuse1;
 uniform sampler2D texture_specular1;
 uniform sampler2D texture_normal1;
+
+
+
+vec3 CalcBumpedNormal()
+{
+    vec3 Normal = normalize(fs_in.Normal);
+    vec3 Tangent = normalize(fs_in.Tangent);
+    Tangent = normalize(Tangent - dot(Tangent, Normal) * Normal);
+    vec3 Bitangent = cross(Tangent, Normal);
+    vec3 BumpMapNormal = texture(texture_normal1, fs_in.TexCoords).xyz;
+    BumpMapNormal = 2.0 * BumpMapNormal - vec3(1.0, 1.0, 1.0);
+    vec3 NewNormal;
+    mat3 TBN = mat3(Tangent, Bitangent, Normal);
+    NewNormal = TBN * BumpMapNormal;
+    NewNormal = normalize(NewNormal);
+    return NewNormal;
+}
 
 void main()
 {    
@@ -37,7 +55,7 @@ void main()
 		 gAlbedoSpec.rgb = texture(texture_diffuse1, fs_in.TexCoords).rgb;
 		 gAlbedoSpec.a = texture(texture_specular1, fs_in.TexCoords).r;
 		 vec3 normal = normalize(texture(texture_normal1, fs_in.TexCoords).rgb * 2.0 - 1.0);
-		 gNormal = normalize(fs_in.TBN * normal);
+		 gNormal = CalcBumpedNormal();
 	}
    
     // store specular intensity in gAlbedoSpec's alpha component
