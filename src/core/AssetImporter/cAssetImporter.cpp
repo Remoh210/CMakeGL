@@ -7,19 +7,18 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <stb_image.h>
 
-
 #include <string>
 #include <fstream>
 #include <sstream>
 #include <iostream>
 #include <map>
 
-cAssetImporter::cAssetImporter()
+cAssetImporter::cAssetImporter(Shader* defaultShader)
 {
 	//Load Main Shaders
+	DefaultShader = defaultShader;
 	std::cout << "Loading default shaders " << std::endl;
-	Shader* shaderGeometryPass = new Shader("8.1.g_buffer.vs", "8.1.g_buffer.fs");
-	mMainShaders["default_shader"] = shaderGeometryPass;
+	mMainShaders["default_shader"] = DefaultShader;
 }
 
 void cAssetImporter::LoadModel(std::string const & path)
@@ -65,7 +64,7 @@ void cAssetImporter::processNode(aiNode *node, const aiScene *scene)
 	}
 }
 
-cMesh* cAssetImporter::processMesh(aiMesh * mesh, const aiScene * scene)
+cMesh* cAssetImporter::processMesh(aiMesh* mesh, const aiScene* scene)
 {
 	// data to fill
 	std::vector<sVertex> vertices;
@@ -135,8 +134,12 @@ cMesh* cAssetImporter::processMesh(aiMesh * mesh, const aiScene * scene)
 	std::vector<sTexture*> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
 	textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 	// 3. normal maps
-	std::vector<sTexture*> normalMaps = loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
+	std::vector<sTexture*> normalMaps = loadMaterialTextures(material, aiTextureType_NORMALS, "texture_normal");
 	textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
+
+	std::vector<sTexture*> normalMaps2 = loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
+	textures.insert(textures.end(), normalMaps2.begin(), normalMaps2.end());
+
 	// 4. height maps
 	std::vector<sTexture*> heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
 	textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());

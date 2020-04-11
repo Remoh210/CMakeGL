@@ -53,39 +53,39 @@ void UI::DrawUI()
 	// Main Window menu 
 
     DrawSceneTree();
+
     ImGui::SameLine();
-    DrawSceneEditor();
+
+	DrawSceneEditor();
+
     ImGui::SameLine();
+
     DrawInspector();
 
-    //Log and stuff
-    ImGui::BeginChild("LowerTabs", ImVec2(WindowSize.x, WindowSize.y /4), true);
+	//Log and stuff
+	ImGui::BeginChild("LowerTabs", ImVec2(WindowSize.x, WindowSize.y / 4), true);
+	ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
+	ImGui::BeginTabBar("LowerTabBar", tab_bar_flags);
+	if (ImGui::BeginTabItem("Content Viewer"))
+	{
+		ImGui::Text("This is the Content tab!\nblah blah blah blah blah");
+		ImGui::EndTabItem();
+	}
+	if (ImGui::BeginTabItem("Log"))
+	{
+		ImGui::Text("This is the Log tab!\nblah blah blah blah blah");
+		ImGui::EndTabItem();
+	}
+	if (ImGui::BeginTabItem("Whatever"))
+	{
+		ImGui::Text("This is the Whatever tab!\nblah blah blah blah blah");
+		ImGui::EndTabItem();
+	}
+	ImGui::EndTabBar();
+	ImGui::EndChild();
 
-	//TABS**************************************************
-    ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
-    ImGui::BeginTabBar("MyTabBar", tab_bar_flags);
-        if (ImGui::BeginTabItem("Content Viewer"))
-        {
-            ImGui::Text("This is the Avocado tab!\nblah blah blah blah blah");
-            ImGui::EndTabItem();
-        }
-        if (ImGui::BeginTabItem("Console"))
-        {
-            ImGui::Text("This is the Broccoli tab!\nblah blah blah blah blah");
-            ImGui::EndTabItem();
-        }
-        if (ImGui::BeginTabItem("Whatever"))
-        {
-            ImGui::Text("This is the Cucumber tab!\nblah blah blah blah blah");
-            ImGui::EndTabItem();
-        }
-        ImGui::EndTabBar();
-
-
-    ImGui::EndChild();
 
     ImGui::End(); //main
-    //int VerticalSizeAdj = 45;
 
     ImGui::ShowDemoWindow();
 
@@ -93,55 +93,96 @@ void UI::DrawUI()
 
 void UI::DrawSceneEditor()
 {
-	ImGuiWindowFlags window_flags = 0;
-	window_flags |= ImGuiWindowFlags_MenuBar;
-	window_flags |= ImGuiWindowFlags_NoResize;
-	window_flags |= ImGuiWindowFlags_AlwaysAutoResize;
-    window_flags |= ImGuiWindowFlags_NoScrollbar;
-    window_flags |= ImGuiWindowFlags_ChildWindow;
-
-    ImVec2 VecScreen = SceneViewSize;
-	int VerticalSizeAdj = 25;
-	if (bFullScreen)
-	{
-		ImGui::SetNextWindowPosCenter();
-		window_flags |= ImGuiWindowFlags_NoTitleBar;
-		window_flags |= ImGuiWindowFlags_NoMove;
-		window_flags |= ImGuiWindowFlags_NoCollapse;
-		VerticalSizeAdj = 17;
-	}
+	//ImGuiWindowFlags window_flags = 0;
+	//window_flags |= ImGuiWindowFlags_MenuBar;
+	//window_flags |= ImGuiWindowFlags_NoResize;
+	//window_flags |= ImGuiWindowFlags_AlwaysAutoResize;
+    //window_flags |= ImGuiWindowFlags_NoScrollbar;
+    //window_flags |= ImGuiWindowFlags_ChildWindow;
+	//
+    //ImVec2 VecScreen = SceneViewSize;
+	//int VerticalSizeAdj = 25;
+	//if (bFullScreen)
+	//{
+	//	ImGui::SetNextWindowPosCenter();
+	//	window_flags |= ImGuiWindowFlags_NoTitleBar;
+	//	window_flags |= ImGuiWindowFlags_NoMove;
+	//	window_flags |= ImGuiWindowFlags_NoCollapse;
+	//	VerticalSizeAdj = 17;
+	//}
+	//	
+	//VecScreen.y += VerticalSizeAdj;
+	//
+	//ImGui::SetNextWindowSize(VecScreen);
+	//
+    //ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+    //ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 1.0f);
+	//
+    //ImGui::BeginChild("id", VecScreen, true, window_flags);
+	//
+	//// Menu Bar
+	//if (ImGui::BeginMenuBar())
+	//{
+	//	if (ImGui::BeginMenu("View"))
+	//	{
+	//		if (ImGui::MenuItem("Full Screen"))
+	//		{
+	//			ToggleFullscreen();
+	//		}
+	//		
+	//		ImGui::EndMenu();
+	//	}
+	//	ImGui::EndMenuBar();
+	//}
 		
+
+    //ImGui::Image((void*)SceneFBO->normalTexture_1_ID, SceneViewSize, ImVec2(0, 1), ImVec2(1, 0));
+    //ImGui::EndChild();
+
+
+    //ImGui::PopStyleVar();
+    //ImGui::PopStyleVar();
+
+
+
+
+	ImVec2 VecScreen = SceneViewSize;
+	int VerticalSizeAdj = 40;
 	VecScreen.y += VerticalSizeAdj;
-
-	ImGui::SetNextWindowSize(VecScreen);
-
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-    ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 1.0f);
-
-    ImGui::BeginChild("id", VecScreen, true, window_flags);
-
-	// Menu Bar
-	if (ImGui::BeginMenuBar())
+	ImGui::BeginChild("MainViews", VecScreen, true);
+	ImGuiTabBarFlags tab_bar_flags2 = ImGuiTabBarFlags_None;
+	ImGui::BeginTabBar("MyTabBar2", tab_bar_flags2);
+	if (ImGui::BeginTabItem("Scene"))
 	{
-		if (ImGui::BeginMenu("View"))
-		{
-			if (ImGui::MenuItem("Full Screen"))
-			{
-				ToggleFullscreen();
-			}
-			
-			ImGui::EndMenu();
-		}
-		ImGui::EndMenuBar();
+		ImGui::Image((void*)SceneFBO->colourTexture_0_ID, SceneViewSize, ImVec2(0, 1), ImVec2(1, 0));
+		ImGui::EndTabItem();
 	}
-		
-
-    ImGui::Image((void*)SceneFBO->normalTexture_1_ID, SceneViewSize, ImVec2(0, 1), ImVec2(1, 0));
-    ImGui::EndChild();
-
-
-    ImGui::PopStyleVar();
-    ImGui::PopStyleVar();
+	if (ImGui::BeginTabItem("Albedo"))
+	{
+		if (GBuffer)
+		{
+			ImGui::Image((void*)GBuffer->colourTexture_0_ID, SceneViewSize, ImVec2(0, 1), ImVec2(1, 0));
+		}
+		ImGui::EndTabItem();
+	}
+	if (ImGui::BeginTabItem("Position"))
+	{
+		if (GBuffer)
+		{
+			ImGui::Image((void*)GBuffer->vertexWorldPos_2_ID, SceneViewSize, ImVec2(0, 1), ImVec2(1, 0));
+		}
+		ImGui::EndTabItem();
+	}
+	if (ImGui::BeginTabItem("Normal"))
+	{
+		if (GBuffer)
+		{
+			ImGui::Image((void*)GBuffer->normalTexture_1_ID, SceneViewSize, ImVec2(0, 1), ImVec2(1, 0));
+		}
+		ImGui::EndTabItem();
+	}
+	ImGui::EndTabBar();
+	ImGui::EndChild();
 
 
 }

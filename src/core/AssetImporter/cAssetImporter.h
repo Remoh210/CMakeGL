@@ -17,7 +17,7 @@
 class cAssetImporter
 {
 public:
-    cAssetImporter();
+    cAssetImporter(Shader* defaultShader);
     void LoadModel(std::string const &path);
 	unsigned int TextureFromFile(const char *path, const std::string &directory, bool gamma = false);
 	std::vector<cStaticMesh*> vec_static_mesh;
@@ -34,7 +34,7 @@ private:
 
 	//??
 	std::map<std::string, Shader*> mMainShaders;
-
+	Shader* DefaultShader;
 	//
 	std::vector<cMesh*> vec_mesh_temp;
 };

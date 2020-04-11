@@ -136,17 +136,18 @@ int main()
 
 	// build and compile shaders
 	// -------------------------
-	Shader shaderGeometryPass("8.1.g_buffer.vs", "8.1.g_buffer.fs");
-	Shader shaderLightingPass("8.1.deferred_shading.vs", "8.1.deferred_shading.fs");
-	Shader shaderLightBox("8.1.deferred_light_box.vs", "8.1.deferred_light_box.fs");
-	Shader motionBlurPass("motion_blur.vs","motion_blur.fs");
+	Shader* shaderGeometryPass = new Shader(FileSystem::getPath("resources/shaders/main_pipeline/g_buffer.vs").c_str(), FileSystem::getPath("resources/shaders/main_pipeline/g_buffer.fs").c_str());
+	Shader shaderLightingPass(FileSystem::getPath("resources/shaders/main_pipeline/lighting_pass.vs").c_str(), FileSystem::getPath("resources/shaders/main_pipeline/lighting_pass.fs").c_str());
+	//Shader shaderLightBox("8.1.deferred_light_box.vs", "8.1.deferred_light_box.fs");
+	Shader motionBlurPass(FileSystem::getPath("resources/shaders/main_pipeline/motion_blur.vs").c_str(), FileSystem::getPath("resources/shaders/main_pipeline/motion_blur.fs").c_str());
 
     // load models
     // -----------
-	AssetLoader = new cAssetImporter();
+	AssetLoader = new cAssetImporter(shaderGeometryPass);
 	
+	AssetLoader->LoadModel(FileSystem::getPath("resources/objects/mutant/FBX 2013/mutant.fbx"));
 	//AssetLoader->LoadModel(FileSystem::getPath("resources/objects/cyborg/cyborg.obj"));
-	AssetLoader->LoadModel(FileSystem::getPath("resources/objects/nanosuit/nanosuit.obj"));
+	//AssetLoader->LoadModel(FileSystem::getPath("resources/objects/nanosuit/nanosuit.obj"));
 	//AssetLoader->LoadModel(FileSystem::getPath("resources/objects/cube/cube.fbx"));
 
 	std::vector<glm::vec3> objectPositions;
@@ -203,8 +204,8 @@ int main()
     motionBlurPass.setInt("gRenderedTex", 0);
 	motionBlurPass.setInt("gDepthTex", 1);
 
-    EditorUI = new UI(ImVec2(SCR_WIDTH, SCR_HEIGHT), ImVec2(SceneViewWidth, SceneViewHeight), GBuffer, window, ResizeFBOs);
-
+    EditorUI = new UI(ImVec2(SCR_WIDTH, SCR_HEIGHT), ImVec2(SceneViewWidth, SceneViewHeight), SceneViewFBO, window, ResizeFBOs);
+	EditorUI->GBuffer = GBuffer;
 	EditorUI->AssetImporter = AssetLoader;
 
 	std::vector<std::string> VecSkyboxTex
@@ -254,7 +255,7 @@ int main()
 		{
 			model = glm::mat4(1.0f);
 			model = glm::translate(model, objectPositions[i]);
-			model = glm::scale(model, glm::vec3(0.25f));
+			model = glm::scale(model, glm::vec3(0.015f));
 
 			glm::mat4 MVP = VP * model;
 			//shaderGeometryPass.setMat4("MVP", MVP);

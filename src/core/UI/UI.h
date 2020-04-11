@@ -59,9 +59,10 @@ private:
 public:
     UI(ImVec2 window_size, ImVec2 scene_view_size, cFBO* scene_fbo, GLFWwindow* window, FBOResizeFunc resize_callback);
     ~UI();
-
+	
 	//Test
 	cAssetImporter* AssetImporter;
+	cFBO* GBuffer;
 	//Test
 
     void DrawUI();
